@@ -1,0 +1,46 @@
+
+
+1 GMM
+
+# For binary y_true, y_score is supposed to be the score of the class with greater label, so the following score is obtained by self.gmm.predict_proba(X_test)[:,1].
+# self.y_scores = self.gmm.predict_proba(X_test)[:, 1]
+# self.gmm.predict_proba(X_test): which just gives that X is predicted as the proba of each cluster, however, it does not consider about the weight of each cluster.
+self.y_scores = self.gmm.predict_proba(X_test)[:, 0]
+# self.y_scores = np.exp(self.gmm._estimate_weighted_log_prob(X_test))[:,0] # which gives that X belongs to the proba of each cluster, condidering the weight of each cluster.
+
+# self.y_scores = self.gmm.score_samples(X_test)
+# [[0.7, 0.3], [0.8, 0.2], ...],It means that gmm predict a sample as label (0) with 0.7 prabability.
+# self.y_scores = 1 - self.gmm.predict_proba(X_test)[:, 1]  # return the class 1 (normal) probability.
+# self.y_scores = self.gmm.decision_function(X=X_test)
+
+
+
+architecture:
+-main():
+
+
+
+class:
+    def __init__():
+        all parameters
+
+
+
+    def individual_experiment():
+        pass
+
+
+    def gridsearch_experiment():
+        for i ..
+            for j ...
+                self.individual_experiment()
+
+    def run():  # interface
+
+        if self.run_flg =='gridsearch':
+            self.gridserch_experiment():
+        else:
+            self.individual_experiment():
+
+
+

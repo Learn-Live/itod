@@ -1,0 +1,16 @@
+seaborn==0.10.0
+scapy==2.4.3
+pandas==0.25.1
+group_lasso==1.1.1
+Keras==2.3.1
+XlsxWriter==1.2.7
+pyod==0.7.7.1
+pytz==2019.2
+numpy==1.18.3
+torch==1.4.0
+scipy==1.4.1
+Cython==0.29.13
+Pympler==0.8
+matplotlib==3.2.1
+scikit_learn==0.23.1
+tensorflow==2.2.0
