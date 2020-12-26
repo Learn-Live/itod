@@ -1243,22 +1243,22 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
                 continue
 
             data_flg = False
-            if "DS10_UNB_IDS/DS11-srcIP_192.168.10.5" in str(v[1]) \
-                    or "DS10_UNB_IDS/DS14-srcIP_192.168.10.14" in str(v[1]) \
-                    or "DS40_CTU_IoT/DS41-srcIP_10.0.2.15" in str(v[1]) \
-                    or "DS50_MAWI_WIDE/DS51-srcIP_202.171.168.50" in str(v[1]) \
-                    or "DS20_PU_SMTV/DS21-srcIP_10.42.0.1" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS63-srcIP_192.168.143.43" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS64-srcIP_192.168.143.48" in str(v[1]):
+            if "UNB/CICIDS_2017/pc_192.168.10.5" in str(v[1]) \
+                    or "UNB/CICIDS_2017/pc_192.168.10.14" in str(v[1]) \
+                    or 'CTU/IOT_2017/pc_10.0.2.15' in str(v[1]) \
+                    or 'MAWI/WIDE_2019/pc_202.171.168.50' in str(v[1]) \
+                    or 'UCHI/IOT_2019/smtv_10.42.0.1' in str(v[1]) \
+                    or 'UCHI/IOT_2019/sfrig_192.168.143.43' in str(v[1]) \
+                    or 'UCHI/IOT_2019/bstch_192.168.143.48' in str(v[1]):
                 data_flg = 'default'
                 # test_size=int(test_size.split()[0].split(':')[1])
                 test_size = [t.split(':')[1] for t in str(v[3]).split()]
 
-            elif "DS10_UNB_IDS/DS12-srcIP_192.168.10.8" in str(v[1]) \
-                    or "DS10_UNB_IDS/DS13-srcIP_192.168.10.9" in str(v[1]) \
-                    or "DS10_UNB_IDS/DS15-srcIP_192.168.10.15" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS61-srcIP_192.168.143.20" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS62-srcIP_192.168.143.42" in str(v[1]):
+            elif "UNB/CICIDS_2017/pc_192.168.10.8" in str(v[1]) \
+                    or "UNB/CICIDS_2017/pc_192.168.10.9" in str(v[1]) \
+                    or "UNB/CICIDS_2017/pc_192.168.10.15" in str(v[1]) \
+                    or 'UCHI/IOT_2019/ghome_192.168.143.20' in str(v[1]) \
+                    or 'UCHI/IOT_2019/scam_192.168.143.42' in str(v[1]):
                 data_flg = 'rest'
                 test_size = [t.split(':')[1] for t in str(v[3]).split()]
 
@@ -3072,138 +3072,149 @@ def save_total_results(results, output_file='xxx.txt', detector_name='GMM', para
 
 
 def main():
-    # # 1. xxx.dat to csv
-    # output_file ='output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat'
-    detector_name, output_file = ('GMM', 'out/reprst/GMM_result_2020-12-23 04:47:46.txt.dat')
-    if os.path.exists(output_file):
-        print('++++', output_file, flush=True)
-    with open(output_file, 'rb') as out_hdl:
-        results = pickle.load(out_hdl)
-    print(results)
-    file_name = write2csv(results, detector_name=detector_name)
-    print(file_name)
-    # # 2. csv to xlsx
-    # # filename=write2xls(results)
-    # # # refresh(filename=filename)
-    # # detector_name = 'KDE'
-    # # input_file = f'../output_data/{detector_name}_results.txt'
-    # # input_file='../output_data/result_2020-01-04 12:41:53.txt'
-    # #
-    # # results = load_result_data(input_file)
-    # # filename = write2csv(results, detector_name=detector_name, output_file=input_file + '.csv')
-    # # print(filename)
-    # # file_name = '../output_data/AE_result_2020-01-17 23:11:00.txt.dat.csv'
-    # # # file_name='../output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat.csv'
-    # file_name = csv2xlsx(file_name, output_file=file_name + '.xlsx')
-    # print(file_name)
+    case = 'find_difference'
+    case = 'csv2figs'
+    out_dir = 'out/report/reprst_srcip_new'
+    if case == 'write2csv':
+        # # 1. xxx.dat to csv
+        # output_file ='output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat'
+        detector_name, output_file = ('GMM', f'{out_dir}/GMM_result_2020-12-23 04:47:46.txt.dat')
+        if os.path.exists(output_file):
+            print('++++', output_file, flush=True)
+        with open(output_file, 'rb') as out_hdl:
+            results = pickle.load(out_hdl)
+        print(results)
+        file_name = write2csv(results, detector_name=detector_name)
+        print(file_name)
+    elif case == 'csv2xlsx':
+        # 2. csv to xlsx
+        # filename=write2xls(results)
+        # # refresh(filename=filename)
+        detector_name = 'KDE'
+        input_file = f'../output_data/{detector_name}_results.txt'
+        # input_file='../output_data/result_2020-01-04 12:41:53.txt'
+        #
+        results = load_result_data(input_file)
+        filename = write2csv(results, detector_name=detector_name, output_file=input_file + '.csv')
+        print(filename)
+        # file_name = '../output_data/AE_result_2020-01-17 23:11:00.txt.dat.csv'
+        # # file_name='../output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat.csv'
+        # file_name = csv2xlsx(file_name, output_file=file_name + '.xlsx')
+        # print(file_name)
+    elif case == 'highlight cell':
+        # 3. highlight cell
+        file_name = '../output_data/PCA_result_2020-03-04 00/53/53-tmp.txt.dat.csv.xlsx_highlight.xlsx'
+        file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
+        file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
+        print(file_name)
+    elif case == 'find_difference':  # file_name_1 - file_name_2
+        # # 4. find differences between two xlsx.
+        # # # file_name = 'output_data/KDE-IF-Results-q_flow=0.90-20200130.xlsx'
+        # dir_root = 'out'
+        # file_name_1 = f'{dir_root}/output_data/AE_20200406.xlsx'
+        file_name_1 = f'{out_dir}/Results-highlight-20201223-srcip.xlsx'
+        # file_name_1 = f'{dir_root}/report/Results-highlight-20201223-both.xlsx'
+        file_name_2 = f'{out_dir}/Results-highlight-20200509-srcip.xlsx'  #
+        # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
+        file_name = diff_files(file_name_1, file_name_2, output_file=file_name_1 + '.diff.xlsx')
+        # print(file_name)
+        # # for i, detector_name in enumerate(['KDE', 'IF']):
+        #     file_name = xlsx_highlight_cells(file_name, sheet_name=detector_name)
+        #     print(file_name)
+    elif case == 'csv2latex':
+        # 5. csv to latex tables
+        file_name = 'output_data/IF_result_2020-02-02 11:13:07-final.txt.dat.csv'
+        """2.5 change csv to latex tables
+           """
+        output_tab = csv2latex_tab('IF', input_file=file_name,
+                                   output_file=file_name + '_tabs.txt', verbose=0)
+        print(f'output_tab: {output_tab}')
+    elif case == 'keep AUC':
+        # 6. only keep AUC in xlsx
+        file_name = '../output_data/CTU-normal-malicious.xlsx'
+        file_name = clean_xlsx(file_name, output_file=file_name + '_clean.xlsx')
+    elif case == 'csv2latex2':
+        output_file = out_dir + 'results_latex.txt'
+        header = False
+        num_feat = 3
+        # if num_feat == 3:
+        #     tab_latex = tab_latex_3
+        # else:
+        #     tab_latex = tab_latex_7
+        # with open(output_file, 'w') as f:
+        #     for i, (detector, input_file) in enumerate(input_files.items()):
+        #         tab_false, tab_true = csv2latex_previous(input_file=input_file,
+        #                                                  tab_latex=tab_latex, caption=detector, do_header=header,
+        #                                                  previous_result=True,
+        #                                                  num_feat=num_feat,
+        #                                                  verbose=0)
+        #
+        #         # tab_false, tab_true = csv2latex(input_file=input_file,
+        #         #                                 tab_latex=tab_latex, caption=detector, do_header=header,
+        #         #                                 num_feat=num_feat,
+        #         #                                 verbose=0)
+        #
+        #         f.write(detector + ':' + input_file + '\n')
+        #         for line in tab_false:
+        #             f.write(line + '\n')
+        #         print()
+        #
+        #         for line in tab_true:
+        #             f.write(line + '\n')
+        #         print()
+        #         f.write('\n')
+    elif case == 'csv2figs':
+        # file_name = '../output_data/AE_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'
+        input_files = [
+            # ("OCSVM", f'{out_dir}/OCSVM.txt.dat.csv.xlsx_highlight.xlsx'),
+            # ("KDE", f'{out_dir}/KDE.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("GMM", f'{out_dir}/GMM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("IF", f'{out_dir}/IF.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("PCA", f'{out_dir}/PCA.txt.dat.csv.xlsx_highlight.xlsx'),
+            # ("AE", f'{out_dir}/AE.txt.dat.csv.xlsx_highlight.xlsx')
+        ]
+        output_file = f'{out_dir}/Results-merged.xlsx'
+        file_name = merge_xlsx(input_files, output_file)
+        # file_name = f'{out_dir}/Results-highlight-20201225.xlsx'
+        # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
+        # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
 
-    # 3. highlight cell
-    # file_name = '../output_data/PCA_result_2020-03-04 00/53/53-tmp.txt.dat.csv.xlsx_highlight.xlsx'
-    # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
-    # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
-    # print(file_name)
+        output_file = f'{out_dir}/res/_latex_tables_figs.txt'
+        if not os.path.exists(os.path.dirname(output_file)):
+            os.makedirs(os.path.dirname(output_file))
+        with open(output_file, 'w') as f:
+            for fig_flg in ['default', 'rest']:  # 'default',
+                for gs in [True, False]:  #
+                    for i, tab_type in enumerate(['basic_representation', 'effect_size',
+                                                  'effect_header']):  # 'appd_all_without_header', 'appd_all_with_header', 'appd_samp', 'feature_dimensions']
+                        # for i, tab_type in enumerate(['effect_header']):
+                        print('\n\n******************')
+                        print(i, tab_type, gs, fig_flg)
+                        try:
+                            # xlsx2latex_tab(file_name, output_file=file_name + "-" + tab_type + '-table_latex.txt',
+                            #                tab_type=tab_type)
+                            # fig_flg = 'default'
+                            xlsx2latex_figure(f=f, input_file=file_name,
+                                              output_file=os.path.dirname(
+                                                  output_file) + "/" + tab_type + '-' + fig_flg + '-figure_latex.txt',
+                                              tab_type=tab_type, fig_flg=fig_flg, gs=gs)
+                            # fig_flg = 'rest'
+                            # xlsx2latex_figure(file_name, output_file=file_name + "-" + tab_type + '-' + fig_flg + '-figure_latex.txt',
+                            #                   tab_type=tab_type, fig_flg=fig_flg, gs=gs)
 
-    # # # 4. find differences between two xlsx.
-    # # # # file_name = 'output_data/KDE-IF-Results-q_flow=0.90-20200130.xlsx'
-    # dir_root = 'examples/out/'
-    # # file_name_1 = f'{dir_root}/output_data/AE_20200406.xlsx'
-    # file_name_1 = f'{dir_root}/output_data/AE_result_2020-05-06 09:43:53-dim=1.5.xlsx'
-    # file_name_2 = f'{dir_root}/output_data/AE_20200509-dim=2.xlsx'  #
-    # # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
-    # file_name = diff_files(file_name_1, file_name_2, output_file=file_name_2 + '.diff.xlsx')
-    # # print(file_name)
-    # # # for i, detector_name in enumerate(['KDE', 'IF']):
-    # #     file_name = xlsx_highlight_cells(file_name, sheet_name=detector_name)
-    # #     print(file_name)
 
-    # 5. csv to latex tables
-    # file_name = 'output_data/IF_result_2020-02-02 11:13:07-final.txt.dat.csv'
-    # """2.5 change csv to latex tables
-    #    """
-    # output_tab = csv2latex_tab('IF', input_file=file_name,
-    #                            output_file=file_name + '_tabs.txt', verbose=0)
-    # print(f'output_tab: {output_tab}')
+                        except Exception as e:
+                            print('Error: ', i, e)
+                            continue
 
-    # # 6. only keep AUC in xlsx
-    # file_name = '../output_data/CTU-normal-malicious.xlsx'
-    # file_name= clean_xlsx(file_name, output_file = file_name+'_clean.xlsx')
+                # release the matplotlib memory
+                # Clear the current figure.
+                plt.clf()
+                # Closes all the figure windows.
+                plt.close('all')
 
-    # output_file = root_dir + 'results_latex.txt'
-    # header = False
-    # num_feat = 3
-    # if num_feat == 3:
-    #     tab_latex = tab_latex_3
-    # else:
-    #     tab_latex = tab_latex_7
-    # with open(output_file, 'w') as f:
-    #     for i, (detector, input_file) in enumerate(input_files.items()):
-    #         tab_false, tab_true = csv2latex_previous(input_file=input_file,
-    #                                                  tab_latex=tab_latex, caption=detector, do_header=header,
-    #                                                  previous_result=True,
-    #                                                  num_feat=num_feat,
-    #                                                  verbose=0)
-    #
-    #         # tab_false, tab_true = csv2latex(input_file=input_file,
-    #         #                                 tab_latex=tab_latex, caption=detector, do_header=header,
-    #         #                                 num_feat=num_feat,
-    #         #                                 verbose=0)
-    #
-    #         f.write(detector + ':' + input_file + '\n')
-    #         for line in tab_false:
-    #             f.write(line + '\n')
-    #         print()
-    #
-    #         for line in tab_true:
-    #             f.write(line + '\n')
-    #         print()
-    #         f.write('\n')
-
-    # file_name = '../output_data/AE_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'
-    # input_files = [("OCSVM", '../output_data/OCSVM_result_2020-03-04 01:28:11-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("KDE", '../output_data/KDE_result_2020-03-04 01:28:11-tmp.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("GMM", '../output_data/GMM_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("IF", '../output_data/IF_result_2020-03-04 01:28:11-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("PCA", '../output_data/PCA_result_2020-03-05 00:18:17-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("AE", '../output_data/AE_result_2020-03-05 10:15:38-tmp.txt.dat.csv.xlsx_highlight.xlsx')]
-    # output_file = input_files[0][-1] + '-merged.xlsx'
-    # # file_name = merge_xlsx(input_files, output_file)
-    # file_name = 'examples/output_data/Results-highlight-20200403.xlsx'
-    # # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
-    # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
-    #
-    # output_file = file_name + '_latex_tables_figs.txt'
-    # with open(output_file, 'w') as f:
-    #     for fig_flg in ['default', 'rest']:  # 'default',
-    #         for gs in [True, False]:  #
-    #             for i, tab_type in enumerate(['basic_representation', 'effect_size',
-    #                                           'effect_header']):  # 'appd_all_without_header', 'appd_all_with_header', 'appd_samp', 'feature_dimensions']
-    #                 # for i, tab_type in enumerate(['effect_header']):
-    #                 print('\n\n******************')
-    #                 print(i, tab_type, gs, fig_flg)
-    #                 try:
-    #                     # xlsx2latex_tab(file_name, output_file=file_name + "-" + tab_type + '-table_latex.txt',
-    #                     #                tab_type=tab_type)
-    #                     # fig_flg = 'default'
-    #                     xlsx2latex_figure(f=f, input_file=file_name,
-    #                                       output_file=file_name + "-" + tab_type + '-' + fig_flg + '-figure_latex.txt',
-    #                                       tab_type=tab_type, fig_flg=fig_flg, gs=gs)
-    #                     # fig_flg = 'rest'
-    #                     # xlsx2latex_figure(file_name, output_file=file_name + "-" + tab_type + '-' + fig_flg + '-figure_latex.txt',
-    #                     #                   tab_type=tab_type, fig_flg=fig_flg, gs=gs)
-    #
-    #
-    #                 except Exception as e:
-    #                     print('Error: ', i, e)
-    #                     continue
-    #
-    #         # release the matplotlib memory
-    #         # Clear the current figure.
-    #         plt.clf()
-    #         # Closes all the figure windows.
-    #         plt.close('all')
-    #
-    #         import gc
-    #         gc.collect()
+                import gc
+                gc.collect()
 
 
 if __name__ == '__main__':

@@ -1,16 +1,22 @@
 """ grid search class
 
 """
-import gc
 # Authors: kun.bj@outlook.com
 #
 # License: xxx
+import os
 import itertools
-
+import pickle
+from copy import deepcopy
+# import tensorflow as tf
+import sys
 from sklearn import clone
-
-
+import gc
 # from keras import backend as K
+from torch import save, load
+import torch
+
+
 # from pympler import asizeof
 
 
@@ -37,7 +43,7 @@ class GridSearch:
         self.scoring = scoring
         self.params = params
 
-    def fit(self, X_train='', y_train='', X_test='', y_test='', refit=True):
+    def fit(self, X_train='', y_train='', X_test='', y_test=''):
         """ get the best parameters of the detector
 
         :param X_train:
@@ -76,28 +82,48 @@ class GridSearch:
 
             if self.scoring == 'auc':
                 if self.detector_idx.auc > self.best_score_:
-                    print(f'self.detector_idx.auc: {self.detector_idx.auc} > self.best_score_: {self.best_score_}')
+                    print(f'self.detector_idx.auc {self.detector_idx.auc} > self.best_score_ {self.best_score_}')
                     self.best_score_ = self.detector_idx.auc
                     self.best_params_ = params  # if key exists, update; otherwise, add new key
 
+                    if self.detector_idx.name == 'AE':  # pleaes don't run multiple AE, because each of them will override the model file and causes the results unreliable.
+                        model_dir = self.detector_idx.params['opt_dir']
+                        header = self.params['header']
+                        # dim = X_train.shape[1]
+                        model_file = f'{model_dir}/idx_{idx}-grid_True-header_{header}-{self.detector_idx.name}_model.pth'  # .h5: save to HDF5 format; .pth: pytorch model
+                        print(f'save AE model to disk: {model_file}')
+                        # self.detector_idx.ae.model_.save(model_file)
+                        if os.path.exists(model_file):
+                            os.remove(model_file)
+                        torch.save(self.detector_idx, model_file)  # overwrite
+
+                        # print(f'deepcopy', asizeof.asizeof(deepcopy(self.detector_idx))//(1024**3), asizeof.asizeof(self.detector_idx))
+                        # self.best_estimator_ = deepcopy(self.detector_idx)      # no matter deepcopy() or copy, both of them can cause memory leak for keras and pytorch
+                        # self.best_estimator_ = clone(self.estimator)  # constructs a new estimator with the same parameters, but not fit
+                        self.best_estimator_ = ''
+                        # self.best_estimator_ .set_params(**params)  # set params
+                        # print(f'deepcopy', asizeof.asizeof(self.best_estimator_) // (1024 ** 3),
+                        #       asizeof.asizeof(self.best_estimator_.ae))
+
+                        self.best_model_file = model_file
+                        del self.detector_idx  # only remove the reference to the object, doesn't free memory
+                        gc.collect()  # free memory immediately
+                        print('---')
+                    else:  # sklearn can use deepcopy()
+                        self.best_estimator_ = deepcopy(self.detector_idx)  # it won't work to tensorflow and keras
                     self.best_index = idx
                     # print(f'best_auc: {self.best_estimator_.auc}, {self.best_score_}')
             else:
                 print(f'scoring: {self.scoring} is not implemented yet, please check and retry')
 
-            del self.detector_idx
+            # del self.detector_idx
+
             print("gc.collect(): ", gc.collect())  # if it's done something you should see a number being outputted
 
         # # summarize the results of the grid search
         print(f'grid.best_score_: {self.best_score_}')
         print(f'grid.best_params_: {self.best_params_}')
+        print(f'grid.best_estimator_: {self.best_estimator_}')
         print(f'grid.best_index: {self.best_index}')
-
-        if refit:
-            self.best_estimator_ = clone(
-                self.estimator)  # constructs a new estimator with the same parameters, but not fit
-            self.best_estimator_.set_params(**self.best_params_)  # set params
-
-            self.best_estimator_.fit(X_train, y_train)
 
         return self

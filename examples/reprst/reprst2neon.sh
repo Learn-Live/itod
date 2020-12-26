@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "conduct experiments in a server named \"neno\""
+echo "conduct experiments in a server named \"neon\""
 
 ### note: run xxx.sh out of the 'examples' directory, i.e. examples/reprst.sh
 ### keep 'the main function' still running after ending ssh session by execuate it in 'tumx'
@@ -40,7 +40,7 @@ echo $exec_time
 #./examples/mem_stats.sh > mem_log_${exec_time}.txt 2>&1 &
 
 #for detector in GMM AE OCSVM KDE IF PCA;
-for detector in PCA GMM; do
+for detector in AE; do
   if [ $detector = GMM ]; then # only GMM needs quickshift
 #    ### install QuickshiftPP
 #    cd itod/detector/postprocessing/quickshift/
@@ -61,9 +61,13 @@ for detector in PCA GMM; do
   fi
 
   # run under "examples"
-  cd examples/
-  echo 'PYTHONPATH=../:./ python3.7 -u IoT_outlier.py -d' ${detector}' > ./log/'${detector}'_'${exec_time}'_log.txt 2>&1 &'
-  PYTHONPATH=../:./ python3.7 -u IoT_outlier.py -d ${detector} >./log/${detector}_${exec_time}_log.txt 2>&1 &
+#  cd examples/
+  # src
+   echo 'PYTHONPATH=../:./ python3.7 -u reprst/main_reprst_srcip.py -d' ${detector}' > ./out/reprst_srcip_new/'${detector}'_'${exec_time}'_log.txt 2>&1 &'
+   PYTHONPATH=../:./ python3.7 -u reprst/main_reprst_srcip.py -d ${detector} >./out/reprst_srcip_new/${detector}_log.txt 2>&1 &
+## both
+#  echo 'PYTHONPATH=../:./ python3.7 -u reprst/main_reprst.py -d' ${detector}' > ./out/reprst/'${detector}'_'${exec_time}'_log.txt 2>&1 &'
+#  PYTHONPATH=../:./ python3.7 -u reprst/main_reprst.py -d ${detector} >./out/reprst/${detector}_log.txt 2>&1 &
   # -u: write to file immediately
   # 2>&1: save stdout and stderr into a same file. I.e. > redirects stdout, 2>&1 redirects stderr to
   #       the same place as stdout

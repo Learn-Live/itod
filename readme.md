@@ -24,12 +24,13 @@
     - setup.py
     - version.txt
    
-    
+<!--    
 # How to install?
 ```
     pip3 install . 
     (pip3 will call setup.py to install the library automatically)
 ```
+-->
 
 # Experiment results 
 ```python3

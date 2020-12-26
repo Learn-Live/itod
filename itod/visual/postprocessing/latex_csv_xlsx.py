@@ -3173,7 +3173,7 @@ def main():
     # dir_root = 'examples/out/'
     # # file_name_1 = f'{dir_root}/output_data/AE_20200406.xlsx'
     # file_name_1 = f'{dir_root}/output_data/AE_result_2020-05-06 09:43:53-dim=1.5.xlsx'
-    # file_name_2 = f'{dir_root}/output_data/AE_20200509-dim=2.xlsx'  #
+    # file_name_2 = f'{dir_root}/output_data/GMM_20200509.xlsx'  #
     # # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
     # file_name = diff_files(file_name_1, file_name_2, output_file=file_name_2 + '.diff.xlsx')
     # # print(file_name)

@@ -22,7 +22,7 @@ Execute:
     # run under "examples"
     cd examples/
     python3 -V
-    PYTHONPATH=../:./ python3.7 reprst/main_reprst.py > out/main_reprst.txt 2>&1 &
+    PYTHONPATH=../:./ python3.7 reprst/main_reprst_srcip.py > out/reprst_srcip_new/main_reprst_srcip.txt 2>&1 &
 
 """
 # Authors: kun.bj@outlook.com
@@ -212,12 +212,19 @@ class DSP(Parameter):
         """
         super(DSP, self).__init__()
         self.dataset_name = dataset_name
-        # original_ipt_dir, only copy, should not be allowed to do any modification
-        self.original_ipt_dir = "./original_data/reprst"
-        self.ipt_dir = "data/reprst"  # ipt_dir
-        self.opt_dir = "./out/reprst"  # opt_dir
+        case = 'new'
+        if case == 'new':  # new data
+            # original_ipt_dir, only copy, should not be allowed to do any modification
+            self.original_ipt_dir = "./original_data/reprst"
+            self.ipt_dir = "data/reprst_srcip_new"  # ipt_dir
+            self.opt_dir = "./out/reprst_srcip_new"  # opt_dir
+        else:
+            # original_ipt_dir, only copy, should not be allowed to do any modification
+            self.original_ipt_dir = "./original_data/reprst_srcip"  # old data
+            self.ipt_dir = "data/reprst_srcip"  # ipt_dir
+            self.opt_dir = "./out/reprst_srcip"  # opt_dir
         self.data_cat = 'INDV'  # data category: INDV, AGMT and MIX
-        self.direction = 'both'  # src: only source ip data; 'both': src+dst
+        self.direction = 'src'  # src: only source ip data; 'both': src+dst
 
         # quantile used to fix features' dimensions
         self.q_iat = 0.9
@@ -558,7 +565,7 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
 
 
 def main_demo():
-    for detector in ['GMM']:  # ['GMM', 'PCA']
+    for detector in ['IF']:  # ['GMM', 'PCA']
         print(f'\n\n***: {detector}')
         args = parse_cmd_args(detector)
         main(detector_name=args.detector.upper(), start_time=args.time)
@@ -577,7 +584,7 @@ def main_demo():
 
 
 @func_notation
-def parse_cmd_args(detector='PCA'):
+def parse_cmd_args(detector='IF'):
     """Parse commandline parameters
 
     Returns:

@@ -364,9 +364,10 @@ class DS10_UNB_IDS(PCAP, Dataset):
                         # pcap_file_2 = get_file_path(ipt_dir=self.params['ipt_dir'], dataset_name=self.dataset_name,
                         #                             data_cat='Monday-WorkingHours',
                         #                             file_name=f'pc_{self.srcIP}.pcap')
-                        pcap_file_1 = filter_ip(friday_pacp, out_file=pcap_file_1, ips=[self.srcIP], direction='both',
+                        pcap_file_1 = filter_ip(friday_pacp, out_file=pcap_file_1, ips=[self.srcIP],
+                                                direction=self.params['direction'],
                                                 keep_original=True)
-                        # pcap_file_2 = filter_ip(monday_pcap, out_file=pcap_file_2, ips=[self.srcIP], direction='both',
+                        # pcap_file_2 = filter_ip(monday_pcap, out_file=pcap_file_2, ips=[self.srcIP], direction =self.params['direction'],
                         #                         keep_original=True)
                         # merge_pcaps([pcap_file_1, pcap_file_2], mrg_pcap_path=self.pcap_file)
                         copyfile(pcap_file_1, self.pcap_file)
@@ -378,9 +379,9 @@ class DS10_UNB_IDS(PCAP, Dataset):
                         #                              data_cat='Monday-WorkingHours',
                         #                              file_name=f'pc_{self.srcIP}.csv')
                         label_file_1 = filter_csv_ip(friday_label, out_file=label_file_1, ips=[self.srcIP],
-                                                     direction='both', keep_original=True)
+                                                     direction=self.params['direction'], keep_original=True)
                         # label_file_2 = filter_csv_ip(monday_label, out_file=label_file_2, ips=[self.srcIP],
-                        #                              direction='both', keep_original=True)
+                        #                              direction =self.params['direction'], keep_original=True)
                         # merge_labels([label_file_1, label_file_2], mrg_label_path=self.label_file)
                         copyfile(label_file_1, self.label_file)
                     elif '192.168.10.15' in self.pcap_file:
@@ -389,28 +390,30 @@ class DS10_UNB_IDS(PCAP, Dataset):
                                                       end_time='2017-07-07 13:00:00', verbose=20, keep_original=True)
                         pcap_file_1 = get_file_path(ipt_dir=self.params['ipt_dir'], dataset_name=self.dataset_name,
                                                     data_cat='Friday-WorkingHours', file_name=f'pc_{self.srcIP}.pcap')
-                        pcap_file_1 = filter_ip(friday_pacp, out_file=pcap_file_1, ips=[self.srcIP], direction='both',
+                        pcap_file_1 = filter_ip(friday_pacp, out_file=pcap_file_1, ips=[self.srcIP],
+                                                direction=self.params['direction'],
                                                 keep_original=True)
                         copyfile(pcap_file_1, self.pcap_file)
 
                         label_file_1 = get_file_path(ipt_dir=self.params['ipt_dir'], dataset_name=self.dataset_name,
                                                      data_cat='Friday-WorkingHours', file_name=f'pc_{self.srcIP}.csv')
                         label_file_1 = filter_csv_ip(friday_label, out_file=label_file_1, ips=[self.srcIP],
-                                                     direction='both', keep_original=True)
+                                                     direction=self.params['direction'], keep_original=True)
                         copyfile(label_file_1, self.label_file)
 
                     else:
 
                         pcap_file_1 = get_file_path(ipt_dir=self.params['ipt_dir'], dataset_name=self.dataset_name,
                                                     data_cat='Friday-WorkingHours', file_name=f'pc_{self.srcIP}.pcap')
-                        pcap_file_1 = filter_ip(friday_pacp, out_file=pcap_file_1, ips=[self.srcIP], direction='both',
+                        pcap_file_1 = filter_ip(friday_pacp, out_file=pcap_file_1, ips=[self.srcIP],
+                                                direction=self.params['direction'],
                                                 keep_original=True)
                         copyfile(pcap_file_1, self.pcap_file)
 
                         label_file_1 = get_file_path(ipt_dir=self.params['ipt_dir'], dataset_name=self.dataset_name,
                                                      data_cat='Friday-WorkingHours', file_name=f'pc_{self.srcIP}.csv')
                         label_file_1 = filter_csv_ip(friday_label, out_file=label_file_1, ips=[self.srcIP],
-                                                     direction='both', keep_original=True)
+                                                     direction=self.params['direction'], keep_original=True)
                         copyfile(label_file_1, self.label_file)
 
         elif self.params['data_cat'] == 'MIX':
@@ -756,7 +759,7 @@ class DS40_CTU_IoT(PCAP, Dataset):
                 self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}_normal.pcap')
-                filter_ip(pcap_file, self.nrml_pcap, ips=['192.168.1.196'], direction='both')
+                filter_ip(pcap_file, self.nrml_pcap, ips=['192.168.1.196'], direction=self.params['direction'])
 
                 # file_name = '2019-01-09-22-46-52-src_192.168.1.196_CTU_IoT_CoinMiner_anomaly.pcap'
                 file_name = 'CTU-IoT-Malware-Capture-34-1_2018-12-21-15-50-14-192.168.1.195.pcap'
@@ -765,7 +768,7 @@ class DS40_CTU_IoT(PCAP, Dataset):
                 self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}_abnormal.pcap')
-                filter_ip(pcap_file, self.anml_pcap, ips=['192.168.1.195'], direction='both')
+                filter_ip(pcap_file, self.anml_pcap, ips=['192.168.1.195'], direction=self.params['direction'])
             else:
                 pass
 
@@ -868,12 +871,12 @@ class DS50_MAWI_WIDE(PCAP, Dataset):
             self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                            dataset_name=self.dataset_name,
                                            file_name=file_name + f'-{self.srcIP}_normal.pcap')
-            filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction='both')
+            filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
             self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                            dataset_name=self.dataset_name,
-                                           file_name=file_name + f'-{self.srcIP}_anomaly.pcap')
-            filter_ip(pcap_file, self.anml_pcap, ips=['202.4.27.109'], direction='both')
+                                           file_name=file_name + f'-202.4.27.109_anomaly.pcap')
+            filter_ip(pcap_file, self.anml_pcap, ips=['202.4.27.109'], direction=self.params['direction'])
 
         elif self.params['data_cat'] == 'AGMT':  # Friday + Monday data
             msg = f'AGMT doesn\'t not be implemented yet.'
@@ -1000,7 +1003,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
                 # file_name = 'google_home-2daysactiv-src_192.168.143.20-anomaly.pcap'
                 file_name = 'fridge_cam_sound_ghome_2daysactiv-ghome_abnormal.pcap'
@@ -1009,7 +1012,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
             elif self.dataset_name == 'UCHI/IOT_2019/scam_192.168.143.42':
                 self.srcIP = '192.168.143.42'
@@ -1021,7 +1024,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
                 # file_name = 'samsung_camera-2daysactiv-src_192.168.143.42-anomaly.pca'
                 file_name = 'fridge_cam_sound_ghome_2daysactiv-scam_abnormal.pcap'
@@ -1030,7 +1033,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
             elif self.dataset_name == 'UCHI/IOT_2019/sfrig_192.168.143.43':
                 self.srcIP = '192.168.143.43'
@@ -1042,7 +1045,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
                 # file_name = 'samsung_fridge-2daysactiv-src_192.168.143.43-anomaly.pcap'
                 file_name = 'fridge_cam_sound_ghome_2daysactiv-sfrig_abnormal.pcap'
@@ -1051,7 +1054,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
             elif self.dataset_name == 'UCHI/IOT_2019/bstch_192.168.143.48':
                 self.srcIP = '192.168.143.48'
@@ -1064,7 +1067,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
                 # file_name = 'bose_soundtouch-2daysactiv-src_192.168.143.48-anomaly.pcap'
                 file_name = 'fridge_cam_sound_ghome_2daysactiv-bstch_abnormal.pcap'
@@ -1073,7 +1076,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
                                                file_name=file_name + f'-{self.srcIP}.pcap')
-                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction='both')
+                filter_ip(pcap_file, self.anml_pcap, ips=[self.srcIP], direction=self.params['direction'])
             else:
                 self.nrml_pcap = self.params[
                                      'ipt_dir'] + '/DS60_UChi_IoT/DS64-srcIP_192.168.143.48/bose_soundtouch_30-sample-src_192.168.143.48_normal.pcap'

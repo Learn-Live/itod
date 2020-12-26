@@ -1454,8 +1454,10 @@ def _load_pcap_to_subflows(pcap_file, num_pkt_thresh=2, interval=0.01, max_pkts=
 
             step_flows.extend(flow_i)  # for IoT dataset, we use step to get more flows.
             if ('anomaly' in pcap_file or 'abnormal' in pcap_file) and 'UCHI/IOT_2019' in pcap_file:
-                if 'scam' in pcap_file or 'ghome' in pcap_file or 'sfirg' in pcap_file or 'bstch' in pcap_file:
-                    step += 10  # 'agument' anomaly files in DS60, scam has to less pakects in each flows, so step = 10
+                if 'ghome' in pcap_file or 'sfirg' in pcap_file or 'bstch' in pcap_file:
+                    step += 10
+                elif 'scam' in pcap_file:  # when direction = 'src'
+                    step += 5  # 'agument' anomaly files in DS60, scam has to less pakects in each flows, so step = 5
                 else:
                     break
             else:
