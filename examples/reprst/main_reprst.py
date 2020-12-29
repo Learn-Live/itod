@@ -217,7 +217,7 @@ class DSP(Parameter):
         self.ipt_dir = "data/reprst"  # ipt_dir
         self.opt_dir = "./out/reprst"  # opt_dir
         self.data_cat = 'INDV'  # data category: INDV, AGMT and MIX
-        self.direction = 'both'  # src: only source ip data; 'both': src+dst
+        self.direction = 'src_dst'  # src: only source ip data; 'both': src+dst
 
         # quantile used to fix features' dimensions
         self.q_iat = 0.9
@@ -390,6 +390,7 @@ class EXPT(DPP):
             'CTU/IOT_2017/pc_10.0.2.15',
 
             'MAWI/WIDE_2019/pc_202.171.168.50',
+            'MAWI/WIDE_2020/pc_203.78.7.165',
 
             'UCHI/IOT_2019/smtv_10.42.0.1',
 
@@ -465,6 +466,7 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
         'CTU/IOT_2017/pc_10.0.2.15',
         #
         'MAWI/WIDE_2019/pc_202.171.168.50',
+        'MAWI/WIDE_2020/pc_203.78.7.165',
         # # # #
         'UCHI/IOT_2019/smtv_10.42.0.1',
 

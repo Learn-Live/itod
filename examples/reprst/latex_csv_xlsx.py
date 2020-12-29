@@ -6,6 +6,7 @@
 # License: GNU GENERAL PUBLIC LICENSE
 
 import os, sys
+import traceback
 
 lib_path = os.path.abspath('.')
 sys.path.append(lib_path)
@@ -307,6 +308,7 @@ def write2csv(result_dict, detector_name='GMM', ws_name='subflows', output_file=
         'CTU/IOT_2017/pc_10.0.2.15',
         #
         'MAWI/WIDE_2019/pc_202.171.168.50',
+        'MAWI/WIDE_2020/pc_203.78.7.165',
         #
         'UCHI/IOT_2019/smtv_10.42.0.1',
         #
@@ -1227,11 +1229,11 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
     if fig_flg == 'rest':
         caption += '_rest'
     if gs:
-        value_lst = value_lst[18:]
+        value_lst = value_lst[17:]  # the start of of best and default results
         caption = caption.replace('xxx', 'best')
         label = "_".join(caption.split()).replace(':', '').replace('/', '_')
     else:
-        value_lst = value_lst[:18]
+        value_lst = value_lst[1:16]
         caption = caption.replace('xxx', 'default')
         label = "_".join(caption.split()).replace(':', '').replace('/', '_')
 
@@ -1446,12 +1448,15 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
         # print(j, tab_latex[s], v)
         if fig_flg == 'default':
             show_datasets = ['UNB(PC1)', 'UNB(PC4)', 'CTU', 'MAWI', 'TV&PC', 'SFrig', 'BSTch']
-            plot_bar(data['data'], datasets=show_datasets,
-                     repres=representations, colors=colors,
-                     output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
-            # plot_bar_difference_seaborn(data, datasets=['UNB(PC1)','UNB(PC4)', 'CTU', 'MAWI', 'TV&PC',  'SFrig', 'BSTch'],
-            #          representations=representations, colors=colors,
-            #          output_file=f"../output_data/{label.replace('/','_')}.pdf")
+            try:
+                plot_bar(data['data'], datasets=show_datasets,
+                         repres=representations, colors=colors,
+                         output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
+                # plot_bar_difference_seaborn(data, datasets=['UNB(PC1)','UNB(PC4)', 'CTU', 'MAWI', 'TV&PC',  'SFrig', 'BSTch'],
+                #          representations=representations, colors=colors,
+                #          output_file=f"../output_data/{label.replace('/','_')}.pdf")
+            except Exception as e:
+                traceback.print_exc()
         elif fig_flg == 'rest':
             show_datasets = ['UNB(PC2)', 'UNB(PC3)', 'UNB(PC5)', 'GHom', 'SCam']
             plot_bar(data['data'], datasets=show_datasets,
@@ -2356,9 +2361,9 @@ def get_diff(values_1, values_2):
             values.append(v_1)
             continue
         if '(' in str(v_1):
-            v_1 = v_1.split('(')[0]
-            v_2 = v_2.split('(')[0]
             try:
+                v_1 = v_1.split('(')[0]
+                v_2 = v_2.split('(')[0]
                 values.append(float(f'{float(v_1) - float(v_2):.4f}'))
             except Exception as e:
                 print(f'i {i}, Error: {e}')
@@ -2400,15 +2405,21 @@ def merge_xlsx(input_files=[], output_file='merged.xlsx'):
     for t, (sheet_name, input_file) in enumerate(input_files):
         print(t, sheet_name, input_file)
         worksheet = workbook.add_worksheet(sheet_name)
-        df = pd.read_excel(input_file, header=None, index_col=None)
-        values = df.values
-        rows, cols = values.shape
-        # add column index
-        worksheet.write_row(0, 0, [str(i) for i in range(cols)])
-        for i in range(rows):
-            worksheet.write_row(i + 1, 0, [str(v) if str(v) != 'nan' else '' for v in
+        if not os.path.exists(input_file):
+            # for i in range(rows):
+            #     worksheet.write_row(i, 0, [str(v) if str(v) != 'nan' else '' for v in
+            #                                    list(values[i])])  # write a list from (row, col)
+            pass
+        else:
+            df = pd.read_excel(input_file, header=None, index_col=None)
+            values = df.values
+            rows, cols = values.shape
+            # add column index
+            # worksheet.write_row(0, 0, [str(i) for i in range(cols)])
+            for i in range(rows):
+                worksheet.write_row(i, 0, [str(v) if str(v) != 'nan' else '' for v in
                                            list(values[i])])  # write a list from (row, col)
-        # worksheet.write(df.values)
+            # worksheet.write(df.values)
     workbook.close()
 
     return output_file
@@ -3074,7 +3085,7 @@ def save_total_results(results, output_file='xxx.txt', detector_name='GMM', para
 def main():
     case = 'find_difference'
     case = 'csv2figs'
-    out_dir = 'out/report/reprst_srcip_new'
+    out_dir = 'out/report/reprst_srcip/20201227'
     if case == 'write2csv':
         # # 1. xxx.dat to csv
         # output_file ='output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat'
@@ -3112,12 +3123,25 @@ def main():
         # # # file_name = 'output_data/KDE-IF-Results-q_flow=0.90-20200130.xlsx'
         # dir_root = 'out'
         # file_name_1 = f'{dir_root}/output_data/AE_20200406.xlsx'
-        file_name_1 = f'{out_dir}/Results-highlight-20201223-srcip.xlsx'
-        # file_name_1 = f'{dir_root}/report/Results-highlight-20201223-both.xlsx'
+        input_files = [
+            ("OCSVM", f'{out_dir}/OCSVM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("KDE", f'{out_dir}/KDE.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("GMM", f'{out_dir}/GMM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("IF", f'{out_dir}/IF.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("PCA", f'{out_dir}/PCA.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("AE", f'{out_dir}/AE.txt.dat.csv.xlsx_highlight.xlsx')
+        ]
+        output_file = f'{out_dir}/Results-merged.xlsx'
+        file_name_1 = merge_xlsx(input_files, output_file)
         file_name_2 = f'{out_dir}/Results-highlight-20200509-srcip.xlsx'  #
-        # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
-        file_name = diff_files(file_name_1, file_name_2, output_file=file_name_1 + '.diff.xlsx')
-        # print(file_name)
+        output_file = file_name_1 + '.diff.xlsx'
+
+        # file_name_1 = f'out/report/reprst_srcip_new/20201227/Results-merged.xlsx'   # only src
+        # file_name_2 = f'out/report/reprst/20201227/Results-merged.xlsx'  # src+dst data
+        # # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
+        # output_file =  f'out/report/reprst_srcip_new/20201227/srcip-src_dst-diff.xlsx'
+        file_name = diff_files(file_name_1, file_name_2, output_file)
+        print(file_name)
         # # for i, detector_name in enumerate(['KDE', 'IF']):
         #     file_name = xlsx_highlight_cells(file_name, sheet_name=detector_name)
         #     print(file_name)
@@ -3166,12 +3190,12 @@ def main():
     elif case == 'csv2figs':
         # file_name = '../output_data/AE_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'
         input_files = [
-            # ("OCSVM", f'{out_dir}/OCSVM.txt.dat.csv.xlsx_highlight.xlsx'),
-            # ("KDE", f'{out_dir}/KDE.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("OCSVM", f'{out_dir}/OCSVM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("KDE", f'{out_dir}/KDE.txt.dat.csv.xlsx_highlight.xlsx'),
             ("GMM", f'{out_dir}/GMM.txt.dat.csv.xlsx_highlight.xlsx'),
             ("IF", f'{out_dir}/IF.txt.dat.csv.xlsx_highlight.xlsx'),
             ("PCA", f'{out_dir}/PCA.txt.dat.csv.xlsx_highlight.xlsx'),
-            # ("AE", f'{out_dir}/AE.txt.dat.csv.xlsx_highlight.xlsx')
+            ("AE", f'{out_dir}/AE.txt.dat.csv.xlsx_highlight.xlsx')
         ]
         output_file = f'{out_dir}/Results-merged.xlsx'
         file_name = merge_xlsx(input_files, output_file)
@@ -3179,12 +3203,12 @@ def main():
         # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
         # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
 
-        output_file = f'{out_dir}/res/_latex_tables_figs.txt'
+        output_file = f'{out_dir}/res/All_latex_tables_figs.txt'  # all results
         if not os.path.exists(os.path.dirname(output_file)):
             os.makedirs(os.path.dirname(output_file))
         with open(output_file, 'w') as f:
-            for fig_flg in ['default', 'rest']:  # 'default',
-                for gs in [True, False]:  #
+            for fig_flg in ['default', 'rest']:  #:  # 'default' (main paper results), rest(appendix results)
+                for gs in [True, False]:  # :  # gs=True ((best parameters), gs=False (default parameters)
                     for i, tab_type in enumerate(['basic_representation', 'effect_size',
                                                   'effect_header']):  # 'appd_all_without_header', 'appd_all_with_header', 'appd_samp', 'feature_dimensions']
                         # for i, tab_type in enumerate(['effect_header']):

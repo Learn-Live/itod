@@ -153,12 +153,12 @@ def obtain_means_init_quickshift_pp(X, k=None, beta=0.9, thres_n=20):
     try:
         ret_code = model.fit(X)
     except Exception as e:
-        msg = f'quickshift++ fit error: {e}'
+        msg = f'quickshift++ fit error: {e}, ret_code: {ret_code}'
         raise ValueError(msg)
 
-    if ret_code < 0:
-        print(f'ret_code ({ret_code}) < 0, fit fail')
-        raise ValueError('ret_code < 0, fit fail')
+    # if ret_code < 0:
+    #     print(f'ret_code ({ret_code}) < 0, fit fail')
+    #     raise ValueError('ret_code < 0, fit fail')
 
     end = datetime.now()
     quick_training_time = (end - start).total_seconds()
@@ -408,6 +408,9 @@ class GMMFactory(BaseDetectorFactory):
         # select a part of val_data from test_set.
         X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
                                                         stratify=y_test, random_state=42)
+        print(f'gs: {gs}, X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+        if gs: print(f'gs: {gs}, X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+        print(f'gs: {gs}, X_test: {X_test.shape}, y_test: {Counter(y_test)}')
         if gs:
             print(f'with grid search: {detector_name.upper()}, gs: {gs}')
             # find the best parameters of the detector
@@ -508,6 +511,9 @@ class OCSVMFactory(BaseDetectorFactory):
         X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
                                                         stratify=y_test,
                                                         random_state=42)
+        print(f'gs: {gs}, X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+        if gs: print(f'gs: {gs}, X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+        print(f'gs: {gs}, X_test: {X_test.shape}, y_test: {Counter(y_test)}')
         if gs:
             print(f'with grid search: {detector_name.upper()}, gs: {gs}')
             # find the best parameters of the detector
@@ -611,6 +617,9 @@ class KDEFactory(BaseDetectorFactory):
         X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
                                                         stratify=y_test,
                                                         random_state=42)
+        print(f'gs: {gs}, X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+        if gs: print(f'gs: {gs}, X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+        print(f'gs: {gs}, X_test: {X_test.shape}, y_test: {Counter(y_test)}')
         if gs:
             print(f'with grid search: {detector_name.upper()}, gs: {gs}')
             # find the best parameters of the detector
@@ -714,6 +723,9 @@ class AEFactory(BaseDetectorFactory):
         X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
                                                         stratify=y_test,
                                                         random_state=42)
+        print(f'gs: {gs}, X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+        if gs: print(f'gs: {gs}, X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+        print(f'gs: {gs}, X_test: {X_test.shape}, y_test: {Counter(y_test)}')
 
         if gs:
             # raise NotImplementedError('not implemented yet.')
@@ -853,6 +865,9 @@ class IFFactory(BaseDetectorFactory):
         X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
                                                         stratify=y_test,
                                                         random_state=42)
+        print(f'gs: {gs}, X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+        if gs: print(f'gs: {gs}, X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+        print(f'gs: {gs}, X_test: {X_test.shape}, y_test: {Counter(y_test)}')
         if gs:
             print(f'with grid search: {detector_name.upper()}, gs: {gs}')
             # find the best parameters of the detector
@@ -951,6 +966,9 @@ class PCAFactory(BaseDetectorFactory):
         X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
                                                         stratify=y_test,
                                                         random_state=42)
+        print(f'gs: {gs}, X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+        if gs: print(f'gs: {gs}, X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+        print(f'gs: {gs}, X_test: {X_test.shape}, y_test: {Counter(y_test)}')
         if gs:
             print(f'with grid search: {detector_name.upper()}, gs: {gs}')
             # find the best parameters of the detector

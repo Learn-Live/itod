@@ -309,7 +309,7 @@ class PCAP:
                 labels_i = ['None'] * len(flows_i)
             labels.extend(labels_i)
         print(f'num. of flows: {len(flows)}')
-        print(f'num. of labels: {len(labels)}')
+        print(f'num. of labels: {Counter(labels)}')
 
         return flows, labels
 
@@ -1849,7 +1849,7 @@ def extract_subpcap(pcap_file, out_file, start_time, end_time, verbose=20, keep_
     return out_file
 
 
-def filter_ip(pcap_file, out_file, ips=[], direction='both', keep_original=True, verbose=20):
+def filter_ip(pcap_file, out_file, ips=[], direction='src_dst', keep_original=True, verbose=20):
     if not os.path.exists(pcap_file): return ''
     if not pth.exists(pth.dirname(out_file)):
         os.makedirs(pth.dirname(out_file))
@@ -1858,7 +1858,7 @@ def filter_ip(pcap_file, out_file, ips=[], direction='both', keep_original=True,
         ip_str = " or ".join([f'ip.src=={ip}' for ip in ips])
     elif direction == 'dst':
         ip_str = " or ".join([f'ip.dst=={ip}' for ip in ips])
-    else:
+    else:  # src_dst, use forward + backward data
         ip_str = " or ".join([f'ip.addr=={ip}' for ip in ips])
     cmd = f"tshark -r {pcap_file} -w {out_file} {ip_str}"
 
@@ -1874,7 +1874,7 @@ def filter_ip(pcap_file, out_file, ips=[], direction='both', keep_original=True,
     return out_file
 
 
-def filter_csv_ip(label_file, out_file, ips=[], direction='both', keep_original=True, verbose=10):
+def filter_csv_ip(label_file, out_file, ips=[], direction='src_dst', keep_original=True, verbose=10):
     # from shutil import copyfile
     # copyfile(label_file, out_file)
 

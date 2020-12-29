@@ -52,7 +52,7 @@ class DataFactory:
             self.dataset_inst = DS30_OCS_IoT(dataset_name=self.dataset_name, params=self.params)
         elif 'CTU/IOT_2017/' in self.dataset_name:
             self.dataset_inst = DS40_CTU_IoT(dataset_name=self.dataset_name, params=self.params)
-        elif 'MAWI/WIDE_2019' in self.dataset_name:
+        elif 'MAWI/WIDE_2019' in self.dataset_name or 'MAWI/WIDE_2020' in self.dataset_name:
             self.dataset_inst = DS50_MAWI_WIDE(dataset_name=self.dataset_name, params=self.params)
         elif 'UCHI/IOT_2019' in self.dataset_name:
             self.dataset_inst = DS60_UChi_IoT(dataset_name=self.dataset_name, params=self.params)
@@ -470,6 +470,7 @@ class DS10_UNB_IDS(PCAP, Dataset):
                 self.flows, self.labels = self.pcap2flows_with_pcap_label(self.pcap_file, self.label_file,
                                                                           subflow=self.params['subflow'],
                                                                           output_flows_labels=output_flows_labels)
+                self.params['subflow_interval'] = self.subflow_interval
                 if not os.path.exists(output_flows_labels + '-all.dat'):
                     # dump all flows, labels
                     dump_data((self.flows, self.labels, self.subflow_interval),
@@ -577,7 +578,7 @@ class DS20_PU_SMTV(PCAP, Dataset):
                 self.flows, self.labels = self.pcap2flows_with_pcaps(pcap_file_lst=[self.nrml_pcap, self.anml_pcap],
                                                                      subflow=self.params['subflow'],
                                                                      output_flows_labels=output_flows_labels)
-
+                self.params['subflow_interval'] = self.subflow_interval
                 if not os.path.exists(output_flows_labels + '-all.dat'):
                     # dump all flows, labels
                     dump_data((self.flows, self.labels, self.subflow_interval),
@@ -752,7 +753,7 @@ class DS40_CTU_IoT(PCAP, Dataset):
                 self.srcIP = '10.0.2.15'
                 self.params['srcIP'] = self.srcIP
                 # filter pcap
-                # file_name = '2018-12-21-15-50-14-src_192.168.1.195-CTU_IoT_Mirai_normal.pcap'
+                # file_name = '2019-01-09-22-46-52-src_192.168.1.196_CTU_IoT_CoinMiner_anomaly.pcap'
                 file_name = 'CTU-IoT-Malware-Capture-41-1_2019-01-09-22-46-52-192.168.1.196.pcap'
                 pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='CTU/IOT_2017',
                                           file_name=file_name)
@@ -761,13 +762,13 @@ class DS40_CTU_IoT(PCAP, Dataset):
                                                file_name=file_name + f'-{self.srcIP}_normal.pcap')
                 filter_ip(pcap_file, self.nrml_pcap, ips=['192.168.1.196'], direction=self.params['direction'])
 
-                # file_name = '2019-01-09-22-46-52-src_192.168.1.196_CTU_IoT_CoinMiner_anomaly.pcap'
+                # file_name = '2018-12-21-15-50-14-src_192.168.1.195-CTU_IoT_Mirai_normal.pcap'
                 file_name = 'CTU-IoT-Malware-Capture-34-1_2018-12-21-15-50-14-192.168.1.195.pcap'
                 pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='CTU/IOT_2017',
                                           file_name=file_name)
                 self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
                                                dataset_name=self.dataset_name,
-                                               file_name=file_name + f'-{self.srcIP}_abnormal.pcap')
+                                               file_name=file_name + f'-192.168.1.195_abnormal.pcap')
                 filter_ip(pcap_file, self.anml_pcap, ips=['192.168.1.195'], direction=self.params['direction'])
             else:
                 pass
@@ -812,7 +813,7 @@ class DS40_CTU_IoT(PCAP, Dataset):
                 self.flows, self.labels = self.pcap2flows_with_pcaps(pcap_file_lst=[self.nrml_pcap, self.anml_pcap],
                                                                      subflow=self.params['subflow'],
                                                                      output_flows_labels=output_flows_labels)
-
+                self.params['subflow_interval'] = self.subflow_interval
                 if not os.path.exists(output_flows_labels + '-all.dat'):
                     # dump all flows, labels
                     dump_data((self.flows, self.labels, self.subflow_interval),
@@ -853,31 +854,59 @@ class DS50_MAWI_WIDE(PCAP, Dataset):
 
         """
         if self.params['data_cat'] == 'INDV':
-            # "http://mawi.wide.ad.jp/mawi/samplepoint-F/2019/201912071400.html"
-            self.srcIP = '202.171.168.50'
-            # self.nrml_pcap = self.params[
-            #                      'ipt_dir'] + '/MAWI/WIDE_2019/pc_202.171.168.50/201912071400-10000000pkts_00000_src_202_171_168_50_normal.pcap'
-            # self.anml_pcap = self.params[
-            #                      'ipt_dir'] + '/MAWI/WIDE_2019/pc_202.171.168.50/201912071400-10000000pkts_00000_src_202_4_27_109_anomaly.pcap'
-            # self.params['srcIP'] = self.srcIP
+            if self.dataset_name == 'MAWI/WIDE_2019/pc_202.171.168.50':
+                # "http://mawi.wide.ad.jp/mawi/samplepoint-F/2019/201912071400.html"
+                self.srcIP = '202.171.168.50'
+                # self.nrml_pcap = self.params[
+                #                      'ipt_dir'] + '/MAWI/WIDE_2019/pc_202.171.168.50/201912071400-10000000pkts_00000_src_202_171_168_50_normal.pcap'
+                # self.anml_pcap = self.params[
+                #                      'ipt_dir'] + '/MAWI/WIDE_2019/pc_202.171.168.50/201912071400-10000000pkts_00000_src_202_4_27_109_anomaly.pcap'
+                # self.params['srcIP'] = self.srcIP
 
-            # filter pcap
-            # file_name = 'samplepoint-F_201912071400.pcap'
-            # editcap -c 300000000 in_file out_file
-            # editcap -c 30000000 samplepoint-F_201912071400.pcap samplepoint-F_201912071400.pcap
-            file_name = 'samplepoint-F_201912071400_00000_20191207000000.pcap'
-            pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='MAWI/WIDE_2019',
-                                      file_name=file_name)
-            self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
-                                           dataset_name=self.dataset_name,
-                                           file_name=file_name + f'-{self.srcIP}_normal.pcap')
-            filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
+                # filter pcap
+                # file_name = 'samplepoint-F_201912071400.pcap'
+                # editcap -c 300000000 in_file out_file
+                # editcap -c 30000000 samplepoint-F_201912071400.pcap samplepoint-F_201912071400.pcap
+                if self.params['direction'] == 'src_dst':
+                    file_name = 'samplepoint-F_201912071400-src_dst_202.171.168.50-5000000.pcap'
+                else:
+                    file_name = 'samplepoint-F_201912071400-src_dst_202.171.168.50.pcap'
+                pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='MAWI/WIDE_2019',
+                                          file_name=file_name)
+                self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
+                                               dataset_name=self.dataset_name,
+                                               file_name=file_name + f'-{self.srcIP}_normal.pcap')
+                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
-            self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
-                                           dataset_name=self.dataset_name,
-                                           file_name=file_name + f'-202.4.27.109_anomaly.pcap')
-            filter_ip(pcap_file, self.anml_pcap, ips=['202.4.27.109'], direction=self.params['direction'])
+                file_name = 'samplepoint-F_201912071400-src_dst_202.4.27.109.pcap'
+                pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='MAWI/WIDE_2019',
+                                          file_name=file_name)
+                self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
+                                               dataset_name=self.dataset_name,
+                                               file_name=file_name + f'-202.4.27.109_abnormal.pcap')
+                filter_ip(pcap_file, self.anml_pcap, ips=['202.4.27.109'], direction=self.params['direction'])
+            elif self.dataset_name == 'MAWI/WIDE_2020/pc_203.78.7.165':
+                # "http://mawi.wide.ad.jp/mawi/samplepoint-F/2020/202007011400.html"
+                self.srcIP = '203.78.7.165'
+                # filter pcap
+                # file_name = 'samplepoint-F_201912071400.pcap'
+                # editcap -c 300000000 in_file out_file
+                # editcap -c 30000000 samplepoint-F_201912071400.pcap samplepoint-F_201912071400.pcap
+                file_name = 'samplepoint-F_202007011400-src_dst_203.78.7.165.pcap'
+                pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='MAWI/WIDE_2020',
+                                          file_name=file_name)
+                self.nrml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
+                                               dataset_name=self.dataset_name,
+                                               file_name=file_name + f'-{self.srcIP}_normal.pcap')
+                filter_ip(pcap_file, self.nrml_pcap, ips=[self.srcIP], direction=self.params['direction'])
 
+                file_name = 'samplepoint-F_202007011400-src_dst_185.8.54.240.pcap'
+                pcap_file = get_file_path(ipt_dir=self.params['original_ipt_dir'], dataset_name='MAWI/WIDE_2020',
+                                          file_name=file_name)
+                self.anml_pcap = get_file_path(ipt_dir=self.params['ipt_dir'],
+                                               dataset_name=self.dataset_name,
+                                               file_name=file_name + f'-185.8.54.240_abnormal.pcap')
+                filter_ip(pcap_file, self.anml_pcap, ips=['185.8.54.240'], direction=self.params['direction'])
         elif self.params['data_cat'] == 'AGMT':  # Friday + Monday data
             msg = f'AGMT doesn\'t not be implemented yet.'
             raise ValueError(msg)
@@ -924,7 +953,7 @@ class DS50_MAWI_WIDE(PCAP, Dataset):
                 self.flows, self.labels = self.pcap2flows_with_pcaps(pcap_file_lst=[self.nrml_pcap, self.anml_pcap],
                                                                      subflow=self.params['subflow'],
                                                                      output_flows_labels=output_flows_labels)
-
+                self.params['subflow_interval'] = self.subflow_interval
                 if not os.path.exists(output_flows_labels + '-all.dat'):
                     # dump all flows, labels
                     dump_data((self.flows, self.labels, self.subflow_interval),
@@ -1131,6 +1160,7 @@ class DS60_UChi_IoT(PCAP, Dataset):
                 self.flows, self.labels = self.pcap2flows_with_pcaps(pcap_file_lst=[self.nrml_pcap, self.anml_pcap],
                                                                      subflow=self.params['subflow'],
                                                                      output_flows_labels=output_flows_labels)
+                self.params['subflow_interval'] = self.subflow_interval
                 if not os.path.exists(output_flows_labels + '-all.dat'):
                     # dump all flows, labels
                     dump_data((self.flows, self.labels, self.subflow_interval),

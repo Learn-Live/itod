@@ -5,6 +5,11 @@
 
 """
 import os, sys
+import pickle
+from collections import Counter
+
+import sklearn
+from sklearn.model_selection import train_test_split
 
 lib_path = os.path.abspath('../')
 sys.path.append(lib_path)
@@ -19,14 +24,35 @@ import numpy as np
 
 sns.set()
 
-from itod_kjl.model.train_test import extract_data, preprocess_data
-from itod_kjl.utils.utils import dump_data
+# from itod.ndm.train_test import extract_data, preprocess_data
+from itod.utils.utils import dump_data
 
 # 0.4 get root logger
-from itod_kjl import log
+# from itod import log
 
-lg = log.get_logger(name=None, level='DEBUG', out_dir='./log/data_kjl', app_name='correlation')
+# lg = log.get_logger(name=None, level='DEBUG', out_dir='./log/data_kjl', app_name='correlation')
 
+datasets = [
+    # Naming: (department/dataname_year/device)
+    'UNB/CICIDS_2017/pc_192.168.10.5',
+    # 'UNB/CICIDS_2017/pc_192.168.10.8',
+    # 'UNB/CICIDS_2017/pc_192.168.10.9',
+    # 'UNB/CICIDS_2017/pc_192.168.10.14',
+    # 'UNB/CICIDS_2017/pc_192.168.10.15',
+    # #
+    'CTU/IOT_2017/pc_10.0.2.15',
+    #
+    'MAWI/WIDE_2019/pc_202.171.168.50',
+    # 'MAWI/WIDE_2020/pc_203.78.7.165',
+    # # # # #
+    # 'UCHI/IOT_2019/smtv_10.42.0.1',
+    #
+    # 'UCHI/IOT_2019/ghome_192.168.143.20',
+    # 'UCHI/IOT_2019/scam_192.168.143.42',
+    'UCHI/IOT_2019/sfrig_192.168.143.43',
+    # 'UCHI/IOT_2019/bstch_192.168.143.48'
+
+]  # 'DEMO_IDS/DS-srcIP_192.168.10.5'
 
 def _get_each_correlation(x, y):
     rho = np.corrcoef(x, y)[0, 1]
@@ -34,32 +60,34 @@ def _get_each_correlation(x, y):
     return rho
 
 
-def get_correlation(in_dir='data/data_reprst/csvs', out_dir='out/data_reprst', header=True):
+def get_data(in_file='.dat', feat_set='iat_size'):
+    with open(in_file, 'rb') as f:
+        inst = pickle.load(f)
+    X_train, y_train, X_test, y_test = inst.dataset_inst.dataset_dict[f'{feat_set}_dict']['data']
+
+    size = 5000
+    if len(y_train) > size:
+        X_train, y_train = sklearn.utils.resample(X_train, y_train, n_samples=size, random_state=42, replace=False)
+
+    # sd_inst = Dataset()
+    # X_train, X_test = sd_inst.normalise_data(X_train, X_test,
+    #                                          norm_method=self.params['norm_method'])
+    # select a part of val_data
+    X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, train_size=int(len(y_test) * 0.2),
+                                                    stratify=y_test,
+                                                    random_state=42)
+    print(f'X_train: {X_train.shape}, y_train: {Counter(y_train)}')
+    print(f'X_val: {X_val.shape}, y_val: {Counter(y_val)}')
+    print(f'X_test: {X_test.shape}, y_test: {Counter(y_test)}')
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
+
+def get_correlation(in_dir='', out_dir='out', header=True):
     # datasets = ['DS10_UNB_IDS/DS11-srcIP_192.168.10.5', # UNB(PC1)
     #             'DS50_MAWI_WIDE/DS51-srcIP_202.171.168.50', # MAWI
     #             'DS60_UChi_IoT/DS63-srcIP_192.168.143.43'   # SFrig
     #             ]
-
-    datasets = [  # 'DEMO_IDS/DS-srcIP_192.168.10.5',
-        'DS10_UNB_IDS/DS11-srcIP_192.168.10.5',  # data_name is unique
-        # 'DS10_UNB_IDS/DS12-srcIP_192.168.10.8',
-        # 'DS10_UNB_IDS/DS13-srcIP_192.168.10.9',
-        # 'DS10_UNB_IDS/DS14-srcIP_192.168.10.14',
-        # 'DS10_UNB_IDS/DS15-srcIP_192.168.10.15',
-
-        # 'DS20_PU_SMTV/DS21-srcIP_10.42.0.1',
-        #
-        # # 'DS30_OCS_IoT/DS31-srcIP_192.168.0.13',
-        #
-        'DS40_CTU_IoT/DS41-srcIP_10.0.2.15',
-        #
-        'DS50_MAWI_WIDE/DS51-srcIP_202.171.168.50',
-
-        # 'DS60_UChi_IoT/DS61-srcIP_192.168.143.20',
-        # 'DS60_UChi_IoT/DS62-srcIP_192.168.143.42',
-        'DS60_UChi_IoT/DS63-srcIP_192.168.143.43',
-        # 'DS60_UChi_IoT/DS64-srcIP_192.168.143.48'
-    ]
 
     feat_sets = ['iat_size']  # all the features has the same header
 
@@ -67,21 +95,22 @@ def get_correlation(in_dir='data/data_reprst/csvs', out_dir='out/data_reprst', h
     for i, dataset in enumerate(datasets):
         for feat_set in feat_sets:
             key_pth = os.path.join(in_dir, dataset, feat_set, f"header:{header}")
-            lg.info(f'i: {i}, key_path: {key_pth}')
+            print(f'i: {i}, key_path: {key_pth}')
             # 1. get data
-            normal_file = os.path.join(key_pth, 'normal.csv')
-            abnormal_file = os.path.join(key_pth, 'abnormal.csv')
-            lg.info(f'normal_file: {normal_file}')
-            lg.info(f'abnormal_file: {abnormal_file}')
-            meta_data = {'idxs_feat': [0, -1], 'train_size': -1, 'test_size': -1}
-            normal_data, abnormal_data = extract_data(normal_file, abnormal_file, meta_data)
-            X_train, X_test, y_train, y_test, kjl_train_set_time, kjl_test_set_time = preprocess_data(normal_data,
-                                                                                                      abnormal_data,
-                                                                                                      kjl=False, d=0,
-                                                                                                      n=0, quant=0,
-                                                                                                      model_name=None,
-                                                                                                      random_state=42)
-
+            # normal_file = os.path.join(key_pth, 'normal.csv')
+            # abnormal_file = os.path.join(key_pth, 'abnormal.csv')
+            # print(f'normal_file: {normal_file}')
+            # print(f'abnormal_file: {abnormal_file}')
+            # meta_data = {'idxs_feat': [0, -1], 'train_size': -1, 'test_size': -1}
+            # normal_data, abnormal_data = extract_data(normal_file, abnormal_file, meta_data)
+            # X_train, X_test, y_train, y_test, kjl_train_set_time, kjl_test_set_time = preprocess_data(normal_data,
+            #                                                                                           abnormal_data,
+            #                                                                                           kjl=False, d=0,
+            #                                                                                           n=0, quant=0,
+            #                                                                                           model_name=None,
+            #                                                                                           random_state=42)
+            in_file = os.path.join(in_dir, dataset, f'all-features-header:{header}.dat')
+            X_train, y_train, X_val, y_val, X_test, y_test = get_data(in_file, feat_set)
             # 2 get correlation
             corrs = []
             for j in range(9):  # the first 9 columns: 8 tcp flags + 1 TTL
@@ -90,26 +119,26 @@ def get_correlation(in_dir='data/data_reprst/csvs', out_dir='out/data_reprst', h
             corr_results[(key_pth, dataset, feat_set, X_test.shape)] = corrs
 
         out_file = os.path.join(out_dir, dataset, feat_set, f"header:{header}", 'correlation.dat')
-        lg.info(f'i: {i}, {dataset}, out_file: {out_file}')
+        print(f'i: {i}, {dataset}, out_file: {out_file}')
         if not os.path.exists(os.path.dirname(out_file)): os.makedirs(os.path.dirname(out_file))
         dump_data((key_pth, corrs), out_file)
 
     # save all results
     out_file = os.path.splitext(out_file)[0] + '_all.dat'
-    lg.info(f'out_file: {out_file}')
+    print(f'out_file: {out_file}')
     dump_data(corr_results, out_file)
 
     return corr_results
 
 
 def plot_correlation_multi(corr_results, out_dir, title=None, show=True):
-    # only show the top 4 figures
+    # # only show the top 4 figures
     datasets = [
-        ('DS10_UNB_IDS/DS11-srcIP_192.168.10.5', 'UNB(PC1)'),  # data_name is unique
+        ('UNB/CICIDS_2017/pc_192.168.10.5', 'UNB(PC1)'),  # data_name is unique
         # ('DS10_UNB_IDS/DS14-srcIP_192.168.10.14', 'UNB(PC4)'),
-        ('DS40_CTU_IoT/DS41-srcIP_10.0.2.15', 'CTU'),
-        ('DS50_MAWI_WIDE/DS51-srcIP_202.171.168.50', 'MAWI'),
-        ('DS60_UChi_IoT/DS63-srcIP_192.168.143.43', 'SFrig'),
+        ('CTU/IOT_2017/pc_10.0.2.15', 'CTU'),
+        ('MAWI/WIDE_2019/pc_202.171.168.50', 'MAWI'),
+        ('UCHI/IOT_2019/sfrig_192.168.143.43', 'SFrig'),
     ]
     new_corr_results = {}
     for i, (dataset, name) in enumerate(datasets):
@@ -125,9 +154,9 @@ def plot_correlation_multi(corr_results, out_dir, title=None, show=True):
     # palette = sns.color_palette('RdPu', 1)  # a list
     palette = [sns.color_palette('YlOrRd', 7)[4]]  # YlOrRd
     fig, axes = plt.subplots(2, cols, figsize=(18, 8))  # (width, height)
-    lg.debug(new_corr_results)
+    print(new_corr_results)
     for i, (key, corrs) in enumerate(new_corr_results.items()):
-        lg.info(f"i: {i}, {key}, corrs: {corrs}")  # hue = feat_set
+        print(f"i: {i}, {key}, corrs: {corrs}")  # hue = feat_set
         key_path, dataset, short_name, feat_set, X_test_shape = key
         # data = [[f'X{_i+1}_y', feat_set, corrs[_i]] if corrs[_i]!=np.nan else 0 for _i in range(9)]
         # data = [[f'X{_i + 1}_y', feat_set, corrs[_i]] for _i in range(9)]
@@ -136,10 +165,10 @@ def plot_correlation_multi(corr_results, out_dir, title=None, show=True):
         data = sorted(range(len(corrs)), key=lambda i: abs(corrs[i]), reverse=True)[:6]  # top 6 values
         # data = [[f'({HEADER[_i]}, y)', feat_set, corrs[_i]] for _i in sorted(data, reverse=False)]
         data = [[f'({HEADER[_i]}, y)', feat_set, corrs[_i]] for _i in data]
-        lg.info(f"i: {i}, {key}, corrs: {data}")
+        print(f"i: {i}, {key}, corrs: {data}")
 
         new_yerrs = [1 / (np.sqrt(X_test_shape[0]))] * 6  # for err_bar
-        lg.debug(f'i: {i}, {new_yerrs}')
+        print(f'i: {i}, {new_yerrs}')
         df = pd.DataFrame(data, columns=[f'Xi_y', 'feat_set', 'corr_rho'])
         if i % cols == 0 and i > 0:
             t += 1
@@ -200,7 +229,7 @@ def plot_correlation_multi(corr_results, out_dir, title=None, show=True):
     # fig.suptitle(title)
     out_file = os.path.join(out_dir, feat_set, "header:True", 'correlation-bar.pdf')
     if not os.path.exists(os.path.dirname(out_file)): os.makedirs(os.path.dirname(out_file))
-    lg.debug(out_file)
+    print(out_file)
     plt.savefig(out_file)  # should use before plt.show()
     if show: plt.show()
     plt.close(fig)
@@ -211,7 +240,7 @@ def plot_correlation_multi(corr_results, out_dir, title=None, show=True):
 
 def plot_correlation(corr_results, out_dir, title=None, show=True):
     for i, (key, corrs) in enumerate(corr_results.items()):
-        lg.info(f"i: {i}, {key}")  # hue = feat_set
+        print(f"i: {i}, {key}")  # hue = feat_set
         key_path, dataset, feat_set, X_test_shape = key
         # data = [[f'X{_i+1}_y', feat_set, corrs[_i]] if corrs[_i]!=np.nan else 0 for _i in range(9)]
         # data = [[f'X{_i + 1}_y', feat_set, corrs[_i]] for _i in range(9)]
@@ -253,7 +282,7 @@ def plot_correlation(corr_results, out_dir, title=None, show=True):
         title = dataset
         g.set_title(title + ' (header:True)', fontsize=13)
         out_file = os.path.join(out_dir, dataset, feat_set, "header:True", '-corr-bar.png')
-        lg.debug(out_file)
+        print(out_file)
         plt.savefig(out_file)  # should use before plt.show()
         if show: plt.show()
         plt.close(fig)
@@ -261,10 +290,17 @@ def plot_correlation(corr_results, out_dir, title=None, show=True):
 
 
 def main():
-    corr_results = get_correlation(in_dir='data/data_reprst/csvs', out_dir='out/data_reprst', header=True)
+    direction = 'src'
+    if direction == 'src':
+        in_dir = 'data/reprst_srcip'
+        out_dir = 'out/reprst_srcip/correlation'
+    else:  # src_dst
+        in_dir = 'data/reprst'
+        out_dir = 'out/reprst/correlation'
+    corr_results = get_correlation(in_dir, out_dir, header=True)
 
-    plot_correlation(corr_results, out_dir='out/data_reprst', show=True)
-    plot_correlation_multi(corr_results, out_dir='out/data_reprst', show=True)
+    plot_correlation(corr_results, out_dir, show=True)
+    plot_correlation_multi(corr_results, out_dir, show=True)
 
 
 if __name__ == '__main__':

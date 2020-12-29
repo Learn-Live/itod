@@ -1,5 +1,5 @@
 """ grid search class
-
+    'htop' check process status
 """
 # Authors: kun.bj@outlook.com
 #

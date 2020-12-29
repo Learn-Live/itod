@@ -213,18 +213,18 @@ class DSP(Parameter):
         super(DSP, self).__init__()
         self.dataset_name = dataset_name
         case = 'new'
+        self.direction = 'src'  # src: only source ip data; 'both': src+dst
         if case == 'new':  # new data
             # original_ipt_dir, only copy, should not be allowed to do any modification
-            self.original_ipt_dir = "./original_data/reprst"
-            self.ipt_dir = "data/reprst_srcip_new"  # ipt_dir
-            self.opt_dir = "./out/reprst_srcip_new"  # opt_dir
-        else:
-            # original_ipt_dir, only copy, should not be allowed to do any modification
-            self.original_ipt_dir = "./original_data/reprst_srcip"  # old data
+            self.original_ipt_dir = "./original_data/reprst"  # new data (around 20201220)
             self.ipt_dir = "data/reprst_srcip"  # ipt_dir
             self.opt_dir = "./out/reprst_srcip"  # opt_dir
+        else:
+            # original_ipt_dir, only copy, should not be allowed to do any modification
+            self.original_ipt_dir = "./original_data/reprst_srcip_old"  # old data (only src data before 20200601)
+            self.ipt_dir = "data/reprst_srcip_old"  # ipt_dir
+            self.opt_dir = "./out/reprst_srcip_old"  # opt_dir
         self.data_cat = 'INDV'  # data category: INDV, AGMT and MIX
-        self.direction = 'src'  # src: only source ip data; 'both': src+dst
 
         # quantile used to fix features' dimensions
         self.q_iat = 0.9
@@ -397,6 +397,7 @@ class EXPT(DPP):
             'CTU/IOT_2017/pc_10.0.2.15',
 
             'MAWI/WIDE_2019/pc_202.171.168.50',
+            'MAWI/WIDE_2020/pc_203.78.7.165',
 
             'UCHI/IOT_2019/smtv_10.42.0.1',
 
@@ -463,22 +464,23 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
     """
     datasets = [
         # Naming: (department/dataname_year/device)
-        'UNB/CICIDS_2017/pc_192.168.10.5',
-        'UNB/CICIDS_2017/pc_192.168.10.8',
-        'UNB/CICIDS_2017/pc_192.168.10.9',
-        'UNB/CICIDS_2017/pc_192.168.10.14',
-        'UNB/CICIDS_2017/pc_192.168.10.15',
-        #
-        'CTU/IOT_2017/pc_10.0.2.15',
+        # 'UNB/CICIDS_2017/pc_192.168.10.5',
+        # 'UNB/CICIDS_2017/pc_192.168.10.8',
+        # 'UNB/CICIDS_2017/pc_192.168.10.9',
+        # 'UNB/CICIDS_2017/pc_192.168.10.14',
+        # 'UNB/CICIDS_2017/pc_192.168.10.15',
+        # #
+        # 'CTU/IOT_2017/pc_10.0.2.15',
         #
         'MAWI/WIDE_2019/pc_202.171.168.50',
-        # # # #
-        'UCHI/IOT_2019/smtv_10.42.0.1',
-
-        'UCHI/IOT_2019/ghome_192.168.143.20',
-        'UCHI/IOT_2019/scam_192.168.143.42',
-        'UCHI/IOT_2019/sfrig_192.168.143.43',
-        'UCHI/IOT_2019/bstch_192.168.143.48'
+        # 'MAWI/WIDE_2020/pc_203.78.7.165',
+        # # # # #
+        # 'UCHI/IOT_2019/smtv_10.42.0.1',
+        #
+        # 'UCHI/IOT_2019/ghome_192.168.143.20',
+        # 'UCHI/IOT_2019/scam_192.168.143.42',
+        # 'UCHI/IOT_2019/sfrig_192.168.143.43',
+        # 'UCHI/IOT_2019/bstch_192.168.143.48'
 
     ]  # 'DEMO_IDS/DS-srcIP_192.168.10.5'
     gses = [False, True]
@@ -584,7 +586,7 @@ def main_demo():
 
 
 @func_notation
-def parse_cmd_args(detector='IF'):
+def parse_cmd_args(detector='GMM'):
     """Parse commandline parameters
 
     Returns:

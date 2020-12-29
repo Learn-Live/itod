@@ -54,11 +54,14 @@ def plot_bar(data=[], datasets=['PC3(UNB)', 'MAWI', 'SFrig(private)'],
     for ind, data_name in enumerate(datasets):
         # print(ind, data_name, datasets)
         for i, reprs in enumerate(repres[:s]):
-            if 'SAMP-' in reprs.upper():
-                max_auc, min_auc = data[ind][i].split(')')[0].split('(')[1].split('-')
-                aucs = [float(max_auc), float(min_auc)]  # max and min aucs
-            else:
-                aucs = [float(data[ind][i]), '']
+            try:
+                if 'SAMP-' in reprs.upper():
+                    max_auc, min_auc = data[ind][i].split(')')[0].split('(')[1].split('-')
+                    aucs = [float(max_auc), float(min_auc)]  # max and min aucs
+                else:
+                    aucs = [float(data[ind][i]), '']
+            except Exception as e:
+                print(f'ind: {ind}, data_name: {data_name}, i: {i}, reprs: {reprs}, e: {e}, out_file: {output_file}')
             rects = plt.bar((ind) + (i) * bar_width, height=aucs[0], width=bar_width, alpha=opacity,
                             color=colors[reprs],
                             label='Frank' + str(i))

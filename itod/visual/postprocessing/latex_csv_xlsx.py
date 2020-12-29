@@ -372,6 +372,7 @@ def write2csv(result_dict, detector_name='GMM', ws_name='subflows', output_file=
         'CTU/IOT_2017/pc_10.0.2.15',
         #
         'MAWI/WIDE_2019/pc_202.171.168.50',
+        'MAWI/WIDE_2020/pc_203.78.7.165',
         #
         'UCHI/IOT_2019/smtv_10.42.0.1',
         #
