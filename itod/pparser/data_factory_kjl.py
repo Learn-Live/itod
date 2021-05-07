@@ -10,8 +10,17 @@ import shutil
 from shutil import copyfile
 
 # 3. local libraries
+from odet.pparser.parser import _get_split_interval, _get_flow_duration, _flows2subflows, _get_frame_time
+
 from itod.pparser.dataset import *
 from itod.pparser.pcap import *
+
+
+def load_flows(in_file):
+    with open(in_file, 'rb') as f:
+        data = pickle.load(f)
+
+    return data
 
 
 class DataFactory:
@@ -46,16 +55,26 @@ class DataFactory:
         """
         if 'UNB/CICIDS_2017' in self.dataset_name:
             self.dataset_inst = DS10_UNB_IDS(dataset_name=self.dataset_name, params=self.params)
+        elif 'UNB24_KJL' in self.dataset_name or 'UNB345_3_KJL' in self.dataset_name:
+            self.dataset_inst = DS10_UNB_IDS_KJL(dataset_name=self.dataset_name, params=self.params)
         elif 'UCHI/IOT_2019/smtv' in self.dataset_name:
             self.dataset_inst = DS20_PU_SMTV(dataset_name=self.dataset_name, params=self.params)
         elif 'DS30_OCS_IoT' in self.dataset_name:
             self.dataset_inst = DS30_OCS_IoT(dataset_name=self.dataset_name, params=self.params)
         elif 'CTU/IOT_2017/' in self.dataset_name:
             self.dataset_inst = DS40_CTU_IoT(dataset_name=self.dataset_name, params=self.params)
+        elif 'CTU1_KJL' in self.dataset_name or 'CTU31_KJL' in self.dataset_name or 'CTU32_KJL' in self.dataset_name:
+            self.dataset_inst = DS40_CTU_IoT_KJL(dataset_name=self.dataset_name, params=self.params)
         elif 'MAWI/WIDE_2019' in self.dataset_name or 'MAWI/WIDE_2020' in self.dataset_name:
             self.dataset_inst = DS50_MAWI_WIDE(dataset_name=self.dataset_name, params=self.params)
+        elif 'MAWI1_2020_KJL' in self.dataset_name:
+            self.dataset_inst = DS50_MAWI_WIDE_KJL(dataset_name=self.dataset_name, params=self.params)
         elif 'UCHI/IOT_2019' in self.dataset_name:
             self.dataset_inst = DS60_UChi_IoT(dataset_name=self.dataset_name, params=self.params)
+        elif 'UCHI/IOT_2020' in self.dataset_name:
+            self.dataset_inst = DS60_UChi_IoT(dataset_name=self.dataset_name, params=self.params)
+        elif 'SFRIG1_2020_KJL' in self.dataset_name:
+            self.dataset_inst = DS60_UChi_IoT_KJL(dataset_name=self.dataset_name, params=self.params)
         elif self.dataset_name.startswith('DEMO_'):
             if self.dataset_name.startswith('DEMO_IDS'):
                 self.dataset_inst = DS10_UNB_IDS(dataset_name=self.dataset_name,
@@ -79,6 +98,77 @@ class DataFactory:
         if len(y_train) < 100 or x_train.shape[-1] > 1000:
             msg = f'x_train.shape: {x_train.shape} is too small or feature dimension is too large'
             raise ValueError(msg)
+
+    @func_notation
+    def get_flows_labels(self):
+        ##############################################################################################
+        # 1. get pcap_file and label_file
+        self.get_files()
+
+        ##############################################################################################
+        # 2. get flows and labels
+        output_flows_labels = self.pcap_file + '-subflow_interval=' + str(
+            self.subflow_interval) + '_q_flow_duration=' + str(self.params['q_flow_dur'])
+
+        try:
+            if self.overwrite:
+                if os.path.exists(output_flows_labels):
+                    suffex = time.strftime("%Y-%m-%d %H", time.localtime())
+                    shutil.move(output_flows_labels, output_flows_labels + f'-{suffex}')
+
+            if os.path.exists(output_flows_labels):
+                self.flows, self.labels, self.subflow_interval = load_flows_label_pickle(output_flows_labels)
+                self.params['subflow_interval'] = self.subflow_interval
+            else:
+                ##############################################################################################
+                # 2.1 pcap_file to flows, label_file to labels
+                print(f'{output_flows_labels} does not exist.')
+                # self.flows, self.labels = self.pcap2flows_with_pcap_label(self.pcap_file, self.label_file,
+                #                                                           subflow=self.params['subflow'],
+                #                                                           output_flows_labels=output_flows_labels)
+
+                normal_flows, normal_labels = load_flows(self.normal_flows_file)
+                abnormal_flows, abnormal_labels = load_flows(self.abnormal_flows_file)
+
+                self.q_flow_dur = self.params['q_flow_dur']
+                self.flows_durations = [_get_flow_duration(pkts) for fid, pkts in normal_flows]
+                self.subflow_interval = np.quantile(self.flows_durations,
+                                                    q=self.q_flow_dur)  # median  of flow_durations
+                print(f'---subflow_interval: ', self.subflow_interval,
+                      f', q_flow_dur: {self.q_flow_dur}')
+
+                normal_flows, normal_labels = _flows2subflows(normal_flows, interval=self.subflow_interval,
+                                                              labels=normal_labels,
+                                                              flow_pkts_thres=2,
+                                                              verbose=1)  # [(5-tuple, pkts_lst)]
+                abnormal_flows, abnormal_labels = _flows2subflows(abnormal_flows, interval=self.subflow_interval,
+                                                                  labels=abnormal_labels,
+                                                                  flow_pkts_thres=2,
+                                                                  verbose=1)
+                self.flows = normal_flows + abnormal_flows
+                self.flows = [(fid, [_get_frame_time(pkt) for pkt in pkts], pkts) for fid, pkts in self.flows]
+                self.labels = ["NORMAL"] * len(normal_flows) + ['ANOMALY'] * len(abnormal_flows)
+
+                self.params['subflow_interval'] = self.subflow_interval
+                if not os.path.exists(output_flows_labels + '-all.dat'):
+                    # dump all flows, labels
+                    dump_data((self.flows, self.labels, self.subflow_interval),
+                              output_file=output_flows_labels + '-all.dat',
+                              verbose=True)
+                ##############################################################################################
+                # 2.2 sample a part of flows and labels to do the following experiment
+                self.flows, self.labels = random_select_flows(self.flows, self.labels,
+                                                              train_size=10000, test_size=1000,
+                                                              experiment=self.params['data_cat'],
+                                                              pcap_file=self.pcap_file)
+                dump_data((self.flows, self.labels, self.subflow_interval), output_file=output_flows_labels,
+                          verbose=True)
+
+        except Exception as e:
+            print(f'Error: {e}, occurs in {os.path.relpath(self.get_flows_labels.__code__.co_filename)} at '
+                  f'{self.get_flows_labels.__code__.co_firstlineno}')
+
+        return self.flows, self.labels
 
 
 class DS10_UNB_IDS(PCAP, Dataset):
@@ -492,6 +582,72 @@ class DS10_UNB_IDS(PCAP, Dataset):
         return self.flows, self.labels
 
 
+class DS10_UNB_IDS_KJL(PCAP, Dataset, DataFactory):
+    """ Actual class used to process data
+
+    """
+
+    def __init__(self, dataset_name='', params={}):
+        super(DS10_UNB_IDS_KJL, self).__init__()
+        self.dataset_name = dataset_name
+        self.params = params
+
+        self.verbose = self.params['verbose']
+        self.params['dataset_name'] = dataset_name
+
+        # subflow: boolean (True or False)
+        # if spit flow or not
+        self.subflow = self.params['subflow']
+        self.subflow_interval = self.params['subflow_interval']
+
+        self.overwrite = self.params['overwrite']
+
+    @func_notation
+    def get_files(self):
+
+        self.label = ''.upper()
+        if self.dataset_name == 'UNB/CICIDS_2017/pc_192.168.10.5':
+            self.srcIP = '192.168.10.5'
+        elif self.dataset_name == 'UNB/CICIDS_2017/pc_192.168.10.8':
+            self.srcIP = '192.168.10.8'
+        elif self.dataset_name == 'UNB/CICIDS_2017/pc_192.168.10.9':
+            self.srcIP = '192.168.10.9'
+        elif self.dataset_name == 'UNB/CICIDS_2017/pc_192.168.10.14':
+            self.srcIP = '192.168.10.14'
+        elif self.dataset_name == 'UNB/CICIDS_2017/pc_192.168.10.15':
+            self.srcIP = '192.168.10.15'
+        elif self.dataset_name == 'UNB24':
+            self.srcIP = 'UNB24_KJL'
+            subdatasets = ('UNB/CICIDS_2017/pc_192.168.10.8',
+                           'UNB/CICIDS_2017/pc_192.168.10.14')  # each_data has normal and abnormal
+
+            self.normal_flows_file = 'data/src_dst/UNB/CICIDS_2017/pc_192.168.10.8/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/src_dst/UNB/CICIDS_2017/pc_192.168.10.14/normal_flows_labels.dat'
+
+        elif self.dataset_name == 'UNB345_3_KJL':  # combine UNB3, 4, 5 attack togeteher, UNB3 normal
+            self.srcIP = 'UNB345_3_KJL'
+
+            self.normal_flows_file = 'data/src_dst/UNB/CICIDS_2017/pc_192.168.10.8/UNB345_3_KJL-normal_flows_labels.dat'
+            if not os.path.exists(self.normal_flows_file):
+                pcs = ['UNB/CICIDS_2017/pc_192.168.10.9', 'UNB/CICIDS_2017/pc_192.168.10.14',
+                       'UNB/CICIDS_2017/pc_192.168.10.15', ]
+                normal_flows = []
+                normal_labels = []
+                for pc in pcs:
+                    # in_file_ =f'data/src_dst/UNB/CICIDS_2017/UNB/CICIDS_2017/pc_192.168.10.8/normal_flows_labels.dat'
+                    in_file_ = f'data/src_dst/{pc}/normal_flows_labels.dat'
+                    flows, labels = load_flows(in_file_)
+                    normal_flows.extend(flows)
+                    normal_labels.extend(labels)
+                dump_data((normal_flows, normal_labels), output_file=self.normal_flows_file)
+
+            # self.abnormal_flows_file = 'data/src_dst/UNB/CICIDS_2017/pc_UNB24_KJL/UNB/CICIDS_2017/pc_192.168.10.14/normal_flows_labels.dat'
+            pc = 'UNB/CICIDS_2017/pc_192.168.10.9'
+            self.abnormal_flows_file = f'data/src_dst/{pc}/normal_flows_labels.dat'
+
+        self.pcap_file = self.normal_flows_file
+
+
 class DS20_PU_SMTV(PCAP, Dataset):
 
     def __init__(self, dataset_name='', params={}):
@@ -597,40 +753,40 @@ class DS20_PU_SMTV(PCAP, Dataset):
 
         return self.flows, self.labels
 
-    # @func_notation
-    # def _get_nrml_anml_smart_tv_data(self, ipt_dir, keep_ip='10.42.0.119', overwrite=True):
-    #     pcap_file_lst = []
-    #     nrml_dir = os.path.join(ipt_dir, 'DS31-srcIP_192.168.0.13', 'normal')
-    #     srcIP = '10.42.0.1'
-    #     for i, pcap in enumerate(os.listdir(nrml_dir)):
-    #         if not pcap.endswith('.pcap'):
-    #             print(f'i:{i + 1}, pcap:{pcap}')
-    #             continue
-    #         pcap_file_lst.append(os.path.join(nrml_dir, pcap))
-    #     sub_data_name = 'DS21-srcIP_10.42.0.1'
-    #     nrml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps', file_name='normal.pcap')
-    #     merge_pcaps(pcap_file_lst, mrg_pcap_path=nrml_pcap)
-    #     src_nrml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps',
-    #                                   file_name=f'srcIP_{srcIP}_normal.pcap')
-    #     # if self.overwrite:
-    #     #     keep_ips_in_pcap(input_file=nrml_pcap, output_file=src_nrml_pcap, kept_ips=[srcIP])
-    #
-    #     pcap_file_lst = []
-    #     srcIP = '10.42.0.119'
-    #     anml_dir = os.path.join(ipt_dir, 'DS31-srcIP_192.168.0.13', 'anomaly')
-    #     for i, pcap in enumerate(os.listdir(anml_dir)):
-    #         if not pcap.endswith('.pcap'):
-    #             print(f'i:{i + 1}, pcap:{pcap}')
-    #             continue
-    #         pcap_file_lst.append(os.path.join(anml_dir, pcap))
-    #     anml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps', file_name='anomaly.pcap')
-    #     merge_pcaps(pcap_file_lst, mrg_pcap_path=anml_pcap)
-    #     src_anml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps',
-    #                                   file_name=f'srcIP_{srcIP}_anomaly.pcap')
-    #     # if overwrite:
-    #     #     keep_ips_in_pcap(input_file=anml_pcap, output_file=src_anml_pcap, kept_ips=[srcIP])
-    #
-    #     return 'multi-srcIPs', src_nrml_pcap, src_anml_pcap
+    @func_notation
+    def _get_nrml_anml_smart_tv_data(self, ipt_dir, keep_ip='10.42.0.119', overwrite=True):
+        pcap_file_lst = []
+        nrml_dir = os.path.join(ipt_dir, 'DS31-srcIP_192.168.0.13', 'normal')
+        srcIP = '10.42.0.1'
+        for i, pcap in enumerate(os.listdir(nrml_dir)):
+            if not pcap.endswith('.pcap'):
+                print(f'i:{i + 1}, pcap:{pcap}')
+                continue
+            pcap_file_lst.append(os.path.join(nrml_dir, pcap))
+        sub_data_name = 'DS21-srcIP_10.42.0.1'
+        nrml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps', file_name='normal.pcap')
+        merge_pcaps(pcap_file_lst, mrg_pcap_path=nrml_pcap)
+        src_nrml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps',
+                                      file_name=f'srcIP_{srcIP}_normal.pcap')
+        # if self.overwrite:
+        #     keep_ips_in_pcap(input_file=nrml_pcap, output_file=src_nrml_pcap, kept_ips=[srcIP])
+
+        pcap_file_lst = []
+        srcIP = '10.42.0.119'
+        anml_dir = os.path.join(ipt_dir, 'DS31-srcIP_192.168.0.13', 'anomaly')
+        for i, pcap in enumerate(os.listdir(anml_dir)):
+            if not pcap.endswith('.pcap'):
+                print(f'i:{i + 1}, pcap:{pcap}')
+                continue
+            pcap_file_lst.append(os.path.join(anml_dir, pcap))
+        anml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps', file_name='anomaly.pcap')
+        merge_pcaps(pcap_file_lst, mrg_pcap_path=anml_pcap)
+        src_anml_pcap = get_file_path(ipt_dir, sub_dir=f'{sub_data_name}/pcaps',
+                                      file_name=f'srcIP_{srcIP}_anomaly.pcap')
+        # if overwrite:
+        #     keep_ips_in_pcap(input_file=anml_pcap, output_file=src_anml_pcap, kept_ips=[srcIP])
+
+        return 'multi-srcIPs', src_nrml_pcap, src_anml_pcap
 
 
 class DS30_OCS_IoT(PCAP, Dataset):
@@ -831,6 +987,49 @@ class DS40_CTU_IoT(PCAP, Dataset):
             print(f'{e}')
 
         return self.flows, self.labels
+
+
+class DS40_CTU_IoT_KJL(PCAP, Dataset, DataFactory):
+    """ Actual class used to process data
+
+    """
+
+    def __init__(self, dataset_name='', params={}):
+        super(DS40_CTU_IoT_KJL, self).__init__()
+        self.dataset_name = dataset_name
+        self.params = params
+
+        self.verbose = self.params['verbose']
+        self.params['dataset_name'] = dataset_name
+
+        # subflow: boolean (True or False)
+        # if spit flow or not
+        self.subflow = self.params['subflow']
+        self.subflow_interval = self.params['subflow_interval']
+
+        self.overwrite = self.params['overwrite']
+
+    @func_notation
+    def get_files(self):
+
+        self.label = ''.upper()
+        if self.dataset_name == 'CTU/IOT_2017/pc_10.0.2.15':
+            pass
+        elif self.dataset_name == 'CTU1_KJL':
+            # pc_192.168.1.196
+            self.normal_flows_file = 'data/src_dst/CTU/IOT_2017/pc_192.168.1.196/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/src_dst/CTU/IOT_2017/pc_192.168.1.196/abnormal_flows_labels.dat'
+        elif self.dataset_name == 'CTU31_KJL':
+            # pc_192.168.1.195
+            self.normal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU31_KJL/pc_192.168.1.191_192.168.1.195/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU31_KJL/pc_192.168.1.191_192.168.1.195/abnormal_flows_labels.dat'
+
+        elif self.dataset_name == 'CTU32_KJL':
+            # pc_192.168.1.196
+            self.normal_flows_file = 'data/src_dst/CTU/IOT_2017/pc_192.168.1.191_192.168.1.196/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/src_dst/CTU/IOT_2017/pc_192.168.1.191_192.168.1.196/abnormal_flows_labels.dat'
+
+        self.pcap_file = self.normal_flows_file
 
 
 class DS50_MAWI_WIDE(PCAP, Dataset):
@@ -1041,6 +1240,49 @@ class DS50_MAWI_WIDE(PCAP, Dataset):
         return self.flows, self.labels
 
 
+class DS50_MAWI_WIDE_KJL(PCAP, Dataset, DataFactory):
+    """ Actual class used to process data
+
+    """
+
+    def __init__(self, dataset_name='', params={}):
+        super(DS50_MAWI_WIDE_KJL, self).__init__()
+        self.dataset_name = dataset_name
+        self.params = params
+
+        self.verbose = self.params['verbose']
+        self.params['dataset_name'] = dataset_name
+
+        # subflow: boolean (True or False)
+        # if spit flow or not
+        self.subflow = self.params['subflow']
+        self.subflow_interval = self.params['subflow_interval']
+
+        self.overwrite = self.params['overwrite']
+
+    @func_notation
+    def get_files(self):
+
+        self.label = ''.upper()
+        if self.dataset_name == 'CTU/IOT_2017/pc_10.0.2.15':
+            pass
+        elif self.dataset_name == 'MAWI1_KJL':
+            # pc_192.168.1.196
+            self.normal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU1_KJL/pc_192.168.1.196/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU1_KJL/pc_192.168.1.196/abnormal_flows_labels.dat'
+        elif self.dataset_name == 'MAWI2_KJL':
+            # pc_192.168.1.195
+            self.normal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU31_KJL/pc_192.168.1.191_192.168.1.195/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU31_KJL/pc_192.168.1.191_192.168.1.195/abnormal_flows_labels.dat'
+
+        elif self.dataset_name == 'MAWI1_2020_KJL':
+            # pc_192.168.1.196
+            self.normal_flows_file = 'data/src_dst/MAWI/WIDE_2020/pc_203.78.7.165/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/src_dst/MAWI/WIDE_2020/pc_203.78.7.165/abnormal_flows_labels.dat'
+
+        self.pcap_file = self.normal_flows_file
+
+
 class DS60_UChi_IoT(PCAP, Dataset):
     def __init__(self, dataset_name='', params={}):
         super(DS60_UChi_IoT, self).__init__()
@@ -1246,6 +1488,49 @@ class DS60_UChi_IoT(PCAP, Dataset):
             print(f'{e}')
 
         return self.flows, self.labels
+
+
+class DS60_UChi_IoT_KJL(PCAP, Dataset, DataFactory):
+    """ Actual class used to process data
+
+    """
+
+    def __init__(self, dataset_name='', params={}):
+        super(DS60_UChi_IoT_KJL, self).__init__()
+        self.dataset_name = dataset_name
+        self.params = params
+
+        self.verbose = self.params['verbose']
+        self.params['dataset_name'] = dataset_name
+
+        # subflow: boolean (True or False)
+        # if spit flow or not
+        self.subflow = self.params['subflow']
+        self.subflow_interval = self.params['subflow_interval']
+
+        self.overwrite = self.params['overwrite']
+
+    @func_notation
+    def get_files(self):
+
+        self.label = ''.upper()
+        if self.dataset_name == 'CTU/IOT_2017/pc_10.0.2.15':
+            pass
+        elif self.dataset_name == 'MAWI1_KJL':
+            # pc_192.168.1.196
+            self.normal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU1_KJL/pc_192.168.1.196/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU1_KJL/pc_192.168.1.196/abnormal_flows_labels.dat'
+        elif self.dataset_name == 'MAWI2_KJL':
+            # pc_192.168.1.195
+            self.normal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU31_KJL/sfrig_192.168.143.43/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/reprst/CTU/IOT_2017/pc_CTU31_KJL/pc_192.168.1.191_192.168.1.195/abnormal_flows_labels.dat'
+
+        elif self.dataset_name == 'SFRIG1_2020_KJL':
+            # pc_192.168.1.196
+            self.normal_flows_file = 'data/src_dst/UCHI/IOT_2020/sfrig_192.168.143.43/normal_flows_labels.dat'
+            self.abnormal_flows_file = 'data/src_dst/UCHI/IOT_2020/sfrig_192.168.143.43/abnormal_flows_labels.dat'
+
+        self.pcap_file = self.normal_flows_file
 
 
 class DS70_CTU_IoT(PCAP, Dataset):

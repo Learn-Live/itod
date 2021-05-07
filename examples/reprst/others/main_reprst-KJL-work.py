@@ -22,7 +22,7 @@ Execute:
     # run under "examples"
     cd examples/
     python3 -V
-    PYTHONPATH=../:./ python3.7 reprst/main_reprst_srcip.py > out/reprst_srcip_new/main_reprst_srcip.txt 2>&1 &
+    PYTHONPATH=../:./ python3.7 reprst/main_reprst.py > out/main_reprst.txt 2>&1 &
 
 """
 # Authors: kun.bj@outlook.com
@@ -61,9 +61,9 @@ import traceback
 
 # 3. Local libraries
 # focus on data processes, which contains pcap2flows, flow2features, and so on.
-from itod.pparser.data_factory import DataFactory
+from itod.pparser.data_factory_kjl import DataFactory
 # highlight on outlier detection algorithms
-from itod.ndm.detector_factory import DetectorFactory
+from itod.ndm.detector_factory_KJL import DetectorFactory
 # # highlight on data visual
 from itod.visual.display_factory import DisplayFactory
 # # include useful tools, such as save data
@@ -212,19 +212,12 @@ class DSP(Parameter):
         """
         super(DSP, self).__init__()
         self.dataset_name = dataset_name
-        case = 'new'
-        self.direction = 'src'  # src: only source ip data; 'both': src+dst
-        if case == 'new':  # new data
-            # original_ipt_dir, only copy, should not be allowed to do any modification
-            self.original_ipt_dir = "./original_data/reprst"  # new data (around 20201220)
-            self.ipt_dir = "data/reprst_srcip"  # ipt_dir
-            self.opt_dir = "./out/reprst_srcip"  # opt_dir
-        else:
-            # original_ipt_dir, only copy, should not be allowed to do any modification
-            self.original_ipt_dir = "./original_data/reprst_srcip_old"  # old data (only src data before 20200601)
-            self.ipt_dir = "data/reprst_srcip_old"  # ipt_dir
-            self.opt_dir = "./out/reprst_srcip_old"  # opt_dir
+        # original_ipt_dir, only copy, should not be allowed to do any modification
+        self.original_ipt_dir = "./original_data/reprst"
+        self.ipt_dir = "data/reprst"  # ipt_dir
+        self.opt_dir = "./out/reprst"  # opt_dir
         self.data_cat = 'INDV'  # data category: INDV, AGMT and MIX
+        self.direction = 'src_dst'  # src: only source ip data; 'both': src+dst
 
         # quantile used to fix features' dimensions
         self.q_iat = 0.9
@@ -398,20 +391,26 @@ class EXPT(DPP):
 
             'MAWI/WIDE_2019/pc_202.171.168.50',
             'MAWI/WIDE_2020/pc_203.78.7.165',
-            # 'MAWI/WIDE_2020/pc_202.75.33.114',
-            'MAWI/WIDE_2020/pc_23.222.78.164',
-            'MAWI/WIDE_2020/pc_203.78.4.32',
-            'MAWI/WIDE_2020/pc_203.78.8.151',
-            'MAWI/WIDE_2020/pc_203.78.4.32',
-            'MAWI/WIDE_2020/pc_203.78.4.32-2',
-            'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
 
             'UCHI/IOT_2019/smtv_10.42.0.1',
 
             'UCHI/IOT_2019/ghome_192.168.143.20',
             'UCHI/IOT_2019/scam_192.168.143.42',
             'UCHI/IOT_2019/sfrig_192.168.143.43',
-            'UCHI/IOT_2019/bstch_192.168.143.48'
+            'UCHI/IOT_2019/bstch_192.168.143.48',
+
+            'UNB234_2_KJL',  # combine UNB2, UNB3, UNB4 attacks, only use UNB2 normal
+            'UNB35_3_KJL',  # combine  UNB3, UNB5 attacks, only use UNB3 normal
+            'UNB345_3_KJL',  # combine UNB3, UNB3, UNB5 attacks, only use UNB3 normal
+            'UNB24_KJL',
+            # CTU: normal + abnormal
+            'CTU1_KJL',
+            'CTU31_KJL',
+            'CTU32_KJL',
+            # MAWI: 2020
+            'MAWI1_2020_KJL',
+            # SFRIG: 2020 IoT data
+            'SFRIG1_2020_KJL'
 
         ] and current_comb['subflow'] == True and current_comb['data_cat'] == 'INDV'):
             valid = True
@@ -469,8 +468,10 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
         start time of the application
 
     """
+
+    # for KJL work, try to find 4 dataset for stats(with header), IAT+SIZE(without header), SAMP_SIZE(without header )
     datasets = [
-        # Naming: (department/dataname_year/device)
+        # # Naming: (department/dataname_year/device)
         # 'UNB/CICIDS_2017/pc_192.168.10.5',
         # 'UNB/CICIDS_2017/pc_192.168.10.8',
         # 'UNB/CICIDS_2017/pc_192.168.10.9',
@@ -478,22 +479,9 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
         # 'UNB/CICIDS_2017/pc_192.168.10.15',
         # #
         # 'CTU/IOT_2017/pc_10.0.2.15',
-        #
+        # #
         # 'MAWI/WIDE_2019/pc_202.171.168.50',
-        # 'MAWI/WIDE_2020/pc_203.78.7.165', # ~25000 (flows src_dst)
-        # 'MAWI/WIDE_2020/pc_23.222.78.164',    # 3 (big flows)
-        # 'MAWI/WIDE_2020/pc_203.78.4.32',    # ~25000 (flows src_dst)
-        # 'MAWI/WIDE_2020/pc_203.78.8.151',   # ~6600 (flows src_dst)
-        # 'MAWI/WIDE_2020/pc_23.223.19.175',  # ~60 (flows src_dst)
-        # 'MAWI/WIDE_2020/pc_114.234.20.197'    # 3 flows(src_dst)
-        # 'MAWI/WIDE_2020/pc_202.75.33.114'  # 2000 flows(src)
-        # 'MAWI/WIDE_2020/202.66.205.237'        # 580 (src)
-
-        # works
-        'MAWI/WIDE_2020/pc_203.78.4.32',
-        'MAWI/WIDE_2020/pc_203.78.4.32-2',
-        'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
-
+        # 'MAWI/WIDE_2020/pc_203.78.7.165',
         # # # # #
         # 'UCHI/IOT_2019/smtv_10.42.0.1',
         #
@@ -501,6 +489,28 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
         # 'UCHI/IOT_2019/scam_192.168.143.42',
         # 'UCHI/IOT_2019/sfrig_192.168.143.43',
         # 'UCHI/IOT_2019/bstch_192.168.143.48'
+
+        # 1. run "the code for kjl paper" to get normal_flows.dat and abnormal_flows.dat
+        # 2 copy them to current project to get the results
+
+        # 'UNB234_2',  # combine UNB2, UNB3, UNB4 attacks, only use UNB2 normal
+        # 'UNB35_3_KJL',  # combine  UNB3, UNB5 attacks, only use UNB3 normal
+        'UNB345_3_KJL',  # combine UNB3, UNB3, UNB5 attacks, only use UNB3 normal
+        # #
+        # # 'UNB24',
+        'CTU1_KJL',
+        # # # # 'CTU21', # normal + abnormal (botnet) # normal 10.0.0.15 (too few normal flows)
+        # # # # # 'CTU22',  # normal + abnormal (coinminer)
+        # # # 'CTU31',  # normal + abnormal (botnet)   # 192.168.1.191
+        'CTU32_KJL',  # normal + abnormal (coinminer)
+        'MAWI1_2020_KJL',
+        # # # # # 'MAWI32_2020',  # 'MAWI/WIDE_2020/pc_203.78.4.32',
+        # # # # 'MAWI32-2_2020',  # 'MAWI/WIDE_2020/pc_203.78.4.32-2',
+        # # 'MAWI165-2_2020',  # 'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
+        # # 'ISTS1',
+        # # 'MACCDC1',
+        'SFRIG1_2020_KJL',
+        # # 'AECHO1_2020',
 
     ]  # 'DEMO_IDS/DS-srcIP_192.168.10.5'
     gses = [False, True]
@@ -587,7 +597,7 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
 
 
 def main_demo():
-    for detector in ['IF']:  # ['GMM', 'PCA']
+    for detector in ['OCSVM']:  # ['GMM', 'PCA']
         print(f'\n\n***: {detector}')
         args = parse_cmd_args(detector)
         main(detector_name=args.detector.upper(), start_time=args.time)
@@ -606,7 +616,7 @@ def main_demo():
 
 
 @func_notation
-def parse_cmd_args(detector='GMM'):
+def parse_cmd_args(detector='OCSVM'):
     """Parse commandline parameters
 
     Returns:

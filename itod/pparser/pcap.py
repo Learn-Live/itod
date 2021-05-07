@@ -389,7 +389,7 @@ def random_select_flows(flows, labels, experiment='ind', train_size=10000, test_
     others = []
     print(Counter(labels))
     for i, label_i in enumerate(labels):
-        if label_i.upper() in ['NORMAL', 'BENIGN']:
+        if label_i.upper() in ['NORMAL', 'BENIGN']:  # be careful "ABNORMAL"
             cnt_normal += 1
         elif label_i.upper() in ['BOT', 'ANOMALY', 'MALICIOUS']:
             cnt_anomaly += 1
@@ -1850,7 +1850,9 @@ def extract_subpcap(pcap_file, out_file, start_time, end_time, verbose=20, keep_
 
 
 def filter_ip(pcap_file, out_file, ips=[], direction='src_dst', keep_original=True, verbose=20):
-    if not os.path.exists(pcap_file): return ''
+    if not os.path.exists(pcap_file):
+        print(f'{pcap_file} does not exist.')
+        return ''
     if not pth.exists(pth.dirname(out_file)):
         os.makedirs(pth.dirname(out_file))
 

@@ -6,6 +6,7 @@
 # License: GNU GENERAL PUBLIC LICENSE
 
 import os, sys
+import traceback
 
 lib_path = os.path.abspath('.')
 sys.path.append(lib_path)
@@ -16,7 +17,6 @@ print(f"add \'{lib_path}\' into sys.path: {sys.path}")
 
 import copy
 from operator import itemgetter
-import os.path as pth
 
 import xlsxwriter
 from matplotlib import rcParams
@@ -41,70 +41,6 @@ sns.palplot(sns.color_palette())
 
 # plt.show()
 # plt.close()
-
-def load_data(output_file):
-    import pickle
-    # output_file = '/Users/kunyang/PycharmProjects/itod/examples/data/reprst/CTU/IOT_2017/pc_10.0.2.15/all-features-header:False.dat'
-    with open(output_file, 'rb') as f:
-        data = pickle.load(f)
-        print(data)
-    return data
-
-
-def _save_csv(value_dict, normal_file, abnormal_file):
-    """Generate a ndm according to the given name.
-        current implemented models are "OCSVM", "GMM",  "IF", "KDE", "PCA" and "AE"
-
-        Parameters
-        ----------
-        model_name: string (default is 'OCSVM')
-            the name of the ndm wants to be generated.
-
-        Returns
-        -------
-            a MODEL instance
-
-        """
-    (x_train, y_train, x_test, y_test) = value_dict['data']
-
-    x_test_normal = []
-    x_test_abnormal = []
-    for j, (x, y) in enumerate(zip(x_test, y_test)):
-        if y == 0:  # normal
-            x_test_normal.append(x)
-        else:
-            x_test_abnormal.append(x)
-
-    dir_name = pth.dirname(normal_file).replace('.dat', '')
-    if not pth.exists(dir_name):
-        os.makedirs(dir_name)
-    X_normal = np.vstack((x_train, np.asarray(x_test_normal)))
-    np.savetxt(normal_file, X_normal, delimiter=',')
-
-    X_abnormal = np.asarray(x_test_abnormal)
-    np.savetxt(abnormal_file, X_abnormal, delimiter=',')
-
-
-def transform_to_csv(dataset_inst, output_dir=''):
-    # opt_dir = pth.join(data_inst['params']['opt_dir'], )
-    header = dataset_inst.params['header']
-    gs = dataset_inst.params['gs']
-
-    dataset = dataset_inst.dataset_dict
-    for i, (key, value_dict) in enumerate(dataset.items()):
-        feat_set = value_dict['feat_set']
-        print(i, feat_set)
-        if 'samp' in feat_set:
-            for _, (_quant, value_quant_dict) in enumerate(value_dict[key].items()):
-                output_dir = output_dir.replace('.dat', '')
-                normal_file = f'{output_dir}/{feat_set}/header:{header}/{_quant}/normal.csv'
-                abnormal_file = f'{output_dir}/{feat_set}/header:{header}/{_quant}/abnormal.csv'
-                _save_csv(value_quant_dict, normal_file, abnormal_file)
-        else:
-            output_dir = output_dir.replace('.dat', '')
-            normal_file = f'{output_dir}/{feat_set}/header:{header}/normal.csv'
-            abnormal_file = f'{output_dir}/{feat_set}/header:{header}/abnormal.csv'
-            _save_csv(value_dict, normal_file, abnormal_file)
 
 
 def find_top_k_values(arr, k=2, reverse=False):
@@ -373,38 +309,14 @@ def write2csv(result_dict, detector_name='GMM', ws_name='subflows', output_file=
         #
         'MAWI/WIDE_2019/pc_202.171.168.50',
         'MAWI/WIDE_2020/pc_203.78.7.165',
-        'MAWI/WIDE_2020/pc_203.78.4.32',
-        'MAWI/WIDE_2020/pc_203.78.4.32-2',
-        'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
+        'MAWI/WIDE_2020/pc_202.119.210.242',
         #
         'UCHI/IOT_2019/smtv_10.42.0.1',
         #
         'UCHI/IOT_2019/ghome_192.168.143.20',
         'UCHI/IOT_2019/scam_192.168.143.42',
         'UCHI/IOT_2019/sfrig_192.168.143.43',
-        'UCHI/IOT_2019/bstch_192.168.143.48',
-
-        # 1. run "the code for kjl paper" to get normal_flows.dat and abnormal_flows.dat
-        # 2 copy them to current project to get the results
-
-        # 'UNB234_2',  # combine UNB2, UNB3, UNB4 attacks, only use UNB2 normal
-        # 'UNB35_3_KJL',  # combine  UNB3, UNB5 attacks, only use UNB3 normal
-        'UNB345_3_KJL',  # combine UNB3, UNB3, UNB5 attacks, only use UNB3 normal
-        #
-        # 'UNB24',
-        'CTU1_KJL',
-        # # # 'CTU21', # normal + abnormal (botnet) # normal 10.0.0.15 (too few normal flows)
-        # # # # 'CTU22',  # normal + abnormal (coinminer)
-        # # 'CTU31',  # normal + abnormal (botnet)   # 192.168.1.191
-        'CTU32_KJL',  # normal + abnormal (coinminer)
-        'MAWI1_2020_KJL',
-        # # # # 'MAWI32_2020',  # 'MAWI/WIDE_2020/pc_203.78.4.32',
-        # # # 'MAWI32-2_2020',  # 'MAWI/WIDE_2020/pc_203.78.4.32-2',
-        # 'MAWI165-2_2020',  # 'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
-        # 'ISTS1',
-        # 'MACCDC1',
-        'SFRIG1_2020_KJL',
-        # 'AECHO1_2020',
+        'UCHI/IOT_2019/bstch_192.168.143.48'
 
     ]  # 'DEMO_IDS/DS-srcIP_192.168.10.5'
 
@@ -873,7 +785,7 @@ def comb_tab_temple(name='', caption='', cols_format='', label='', detector_cols
 
 
 def comb_all_needed_data_tab_temple(name='', caption='', cols_format='', label='', detector_cols=[], feature_cols=[],
-                                    fig_flg='default'):
+                                    fig_flg='default', appendix_flg=False):
     """
     ref: https://tex.stackexchange.com/questions/23385/table-numbering-mismatch-in-caption-and-in-text
     Always put \label after \caption to get the consistent table number format
@@ -929,36 +841,59 @@ def comb_all_needed_data_tab_temple(name='', caption='', cols_format='', label='
         # "\cmidrule{2-" + f"{num_f}" + "}",
         # f" & {feature_cols_str}   \\\ ",
     ]
+    if not appendix_flg:
+        if fig_flg == 'default':
+            num_data = 7
+            for i, detector, in enumerate(detector_cols):
+                tab_latex += ["\midrule",
+                              "\\multirow{" + str(num_data) + "}{*}{~\\rule{0pt}{2.7ex}" + str(detector) + "} " +
+                              "&UNB(PC1) & {v}  \\\ ",
+                              "&UNB(PC4) & {v} \\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&CTU & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&MAWI & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&TV\&PC & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&SFrig & {v} \\\ ",
+                              "&BSTch & {v}  \\\ ", ]
+        else:
+            num_data = 5
+            for i, detector, in enumerate(detector_cols):
+                tab_latex += ["\midrule",
+                              "\\multirow{" + str(num_data) + "}{*}{~\\rule{0pt}{2.7ex}" + str(detector) + "} " +
+                              "&UNB(PC2) & {v}  \\\ ",
+                              "&UNB(PC3) & {v} \\\ ",
+                              "&UNB(PC5) & {v} \\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&GHom & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&SCam & {v}\\\ ",
+                              ]
 
-    if fig_flg == 'default':
-        num_data = 7
-        for i, detector, in enumerate(detector_cols):
-            tab_latex += ["\midrule",
-                          "\\multirow{" + str(num_data) + "}{*}{~\\rule{0pt}{2.7ex}" + str(detector) + "} " +
-                          "&UNB(PC1) & {v}  \\\ ",
-                          "&UNB(PC4) & {v} \\\ ",
-                          "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
-                          "&CTU & {v}\\\ ",
-                          "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
-                          "&MAWI & {v}\\\ ",
-                          "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
-                          "&TV\&PC & {v}\\\ ",
-                          "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
-                          "&SFrig & {v} \\\ ",
-                          "&BSTch & {v}  \\\ ", ]
     else:
-        num_data = 5
-        for i, detector, in enumerate(detector_cols):
-            tab_latex += ["\midrule",
-                          "\\multirow{" + str(num_data) + "}{*}{~\\rule{0pt}{2.7ex}" + str(detector) + "} " +
-                          "&UNB(PC2) & {v}  \\\ ",
-                          "&UNB(PC3) & {v} \\\ ",
-                          "&UNB(PC5) & {v} \\\ ",
-                          "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
-                          "&GHom & {v}\\\ ",
-                          "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
-                          "&SCam & {v}\\\ ",
-                          ]
+        if fig_flg == 'default':
+            num_data = 7
+            for i, detector, in enumerate(detector_cols):
+                tab_latex += ["\midrule",
+                              "\\multirow{" + str(num_data) + "}{*}{" + str(detector) + "} " +  # ~\\rule{0pt}{2.7ex}
+                              "&UNB(PC1) & {v}  \\\ ",
+                              "&UNB(PC2) & {v}  \\\ ",
+                              "&UNB(PC3) & {v} \\\ ",
+                              "&UNB(PC4) & {v} \\\ ",
+                              "&UNB(PC5) & {v} \\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&CTU & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&MAWI & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&TV\&PC & {v}\\\ ",
+                              "\cmidrule{2-" + str(2 + len(feature_cols)) + "}",
+                              "&GHom & {v}\\\ ",
+                              "&SCam & {v}\\\ ",
+                              "&SFrig & {v} \\\ ",
+                              "&BSTch & {v}  \\\ ", ]
 
     tab_latex += ["\\bottomrule",
                   "\end{tabulary}",
@@ -1318,11 +1253,11 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
     if fig_flg == 'rest':
         caption += '_rest'
     if gs:
-        value_lst = value_lst[18:]
+        value_lst = value_lst[17:]  # the start of of best and default results
         caption = caption.replace('xxx', 'best')
         label = "_".join(caption.split()).replace(':', '').replace('/', '_')
     else:
-        value_lst = value_lst[:18]
+        value_lst = value_lst[1:16]
         caption = caption.replace('xxx', 'default')
         label = "_".join(caption.split()).replace(':', '').replace('/', '_')
 
@@ -1334,22 +1269,28 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
                 continue
 
             data_flg = False
-            if "DS10_UNB_IDS/DS11-srcIP_192.168.10.5" in str(v[1]) \
-                    or "DS10_UNB_IDS/DS14-srcIP_192.168.10.14" in str(v[1]) \
-                    or "DS40_CTU_IoT/DS41-srcIP_10.0.2.15" in str(v[1]) \
-                    or "DS50_MAWI_WIDE/DS51-srcIP_202.171.168.50" in str(v[1]) \
-                    or "DS20_PU_SMTV/DS21-srcIP_10.42.0.1" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS63-srcIP_192.168.143.43" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS64-srcIP_192.168.143.48" in str(v[1]):
+            # main paper
+            if "UNB/CICIDS_2017/pc_192.168.10.5" in str(v[1]) \
+                    or "UNB/CICIDS_2017/pc_192.168.10.14" in str(v[1]) \
+                    or 'CTU/IOT_2017/pc_10.0.2.15' in str(v[1]) \
+                    or 'MAWI/WIDE_2019/pc_202.171.168.50' in str(v[1]) \
+                    or 'MAWI/WIDE_2020/pc_203.78.7.165' in str(v[1]) \
+                    or 'MAWI/WIDE_2020/pc_202.119.210.242' in str(v[1]) \
+                    or 'MAWI/WIDE_2020/pc_203.78.4.32' in str(v[1]) \
+                    or 'MAWI/WIDE_2020/pc_203.78.4.32-2' in str(v[1]) \
+                    or 'MAWI/WIDE_2020/pc_203.78.7.165-2' in str(v[1]) \
+                    or 'UCHI/IOT_2019/smtv_10.42.0.1' in str(v[1]) \
+                    or 'UCHI/IOT_2019/sfrig_192.168.143.43' in str(v[1]) \
+                    or 'UCHI/IOT_2019/bstch_192.168.143.48' in str(v[1]):
                 data_flg = 'default'
                 # test_size=int(test_size.split()[0].split(':')[1])
                 test_size = [t.split(':')[1] for t in str(v[3]).split()]
-
-            elif "DS10_UNB_IDS/DS12-srcIP_192.168.10.8" in str(v[1]) \
-                    or "DS10_UNB_IDS/DS13-srcIP_192.168.10.9" in str(v[1]) \
-                    or "DS10_UNB_IDS/DS15-srcIP_192.168.10.15" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS61-srcIP_192.168.143.20" in str(v[1]) \
-                    or "DS60_UChi_IoT/DS62-srcIP_192.168.143.42" in str(v[1]):
+            # appendix result
+            elif "UNB/CICIDS_2017/pc_192.168.10.8" in str(v[1]) \
+                    or "UNB/CICIDS_2017/pc_192.168.10.9" in str(v[1]) \
+                    or "UNB/CICIDS_2017/pc_192.168.10.15" in str(v[1]) \
+                    or 'UCHI/IOT_2019/ghome_192.168.143.20' in str(v[1]) \
+                    or 'UCHI/IOT_2019/scam_192.168.143.42' in str(v[1]):
                 data_flg = 'rest'
                 test_size = [t.split(':')[1] for t in str(v[3]).split()]
 
@@ -1376,13 +1317,17 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
             v_tmp = change_line(v_arr, k=2, value_type=value_type)
 
             if tab_type.upper() == 'basic_representation'.upper():
-                representations = ["STATS", "IAT", "IAT-FFT", "SAMP-NUM", "SAMP-NUM-FFT"]  # all without header
+                representations = ["STATS", "IAT", "IAT-FFT", "SAMP-NUM", "SAMP-NUM-FFT", "SAMP-SIZE",
+                                   "SAMP-SIZE-FFT"]  # all without header
                 # colors = ['m', 'green', 'darkgreen', 'red', 'darkred']
                 colors = seaborn_palette(tab_type, fig_type='raw')
                 value_type = 'best+min'
                 v_arr = [process_value(v[10]), process_value(v[4]), process_value(v[7]),
                          process_samp_value(v[11], value_type=value_type),
-                         process_samp_value(v[14], value_type=value_type)]
+                         process_samp_value(v[14], value_type=value_type),
+                         process_samp_value(v[12], value_type=value_type),
+                         process_samp_value(v[15], value_type=value_type)
+                         ]
                 if data_flg == fig_flg:
                     # data_flg = False
                     tmp_arr = []
@@ -1537,17 +1482,22 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
         # print(j, tab_latex[s], v)
         if fig_flg == 'default':
             show_datasets = ['UNB(PC1)', 'UNB(PC4)', 'CTU', 'MAWI', 'TV&RT', 'SFrig', 'BSTch']
-            plot_bar(data['data'], datasets=show_datasets,
-                     repres=representations, colors=colors,
-                     output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
-            # plot_bar_difference_seaborn(data, datasets=['UNB(PC1)','UNB(PC4)', 'CTU', 'MAWI', 'TV&RT',  'SFrig', 'BSTch'],
-            #          representations=representations, colors=colors,
-            #          output_file=f"../output_data/{label.replace('/','_')}.pdf")
+            show_datasets = ['MAWI_32', 'MAWI_32-2', 'MAWI_165-2']
+            # show_datasets = show_datasets[:len(data['data'])]
+            # try:
+            #     plot_bar(data['data'], datasets=show_datasets,
+            #              repres=representations, colors=colors,
+            #              output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
+            #     # plot_bar_difference_seaborn(data, datasets=['UNB(PC1)','UNB(PC4)', 'CTU', 'MAWI', 'TV&RT',  'SFrig', 'BSTch'],
+            #     #          representations=representations, colors=colors,
+            #     #          output_file=f"../output_data/{label.replace('/','_')}.pdf")
+            # except Exception as e:
+            #     traceback.print_exc()
         elif fig_flg == 'rest':
             show_datasets = ['UNB(PC2)', 'UNB(PC3)', 'UNB(PC5)', 'GHom', 'SCam']
-            plot_bar(data['data'], datasets=show_datasets,
-                     repres=representations, colors=colors,
-                     output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
+            # plot_bar(data['data'], datasets=show_datasets,
+            #          repres=representations, colors=colors,
+            #          output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
         output_file = f"{label}.pdf"  # for latex
         figure_latex = figure_temple(name=tab_type, caption=caption, cols_format=cols_format, label=label,
                                      cols=cols, output_file=output_file)
@@ -1700,7 +1650,7 @@ def xlsx2latex_tab(input_file='', output_file='', caption='', tab_type='basic_re
 def write_combined_reuslts_to_table(f='', tab_f='', all_neeed_f='', data={}, show_detectors='', show_datasets='',
                                     tab_type='',
                                     show_repres='',
-                                    gs='', fig_flg='default', caption=''):
+                                    gs='', fig_flg='default', caption='', appendix_flg=False):
     s_data = {}
     for j, detector_name in enumerate(show_detectors):
         sub_dataset = []
@@ -1841,7 +1791,7 @@ def write_combined_reuslts_to_table(f='', tab_f='', all_neeed_f='', data={}, sho
         tab_latex = comb_all_needed_data_tab_temple(name=tab_type, caption=caption, cols_format=cols_format,
                                                     label=label,
                                                     detector_cols=show_detectors, feature_cols=feature_cols,
-                                                    fig_flg=fig_flg)
+                                                    fig_flg=fig_flg, appendix_flg=appendix_flg)
 
         # write begin
         for s, line in enumerate(tab_latex):
@@ -1851,6 +1801,8 @@ def write_combined_reuslts_to_table(f='', tab_f='', all_neeed_f='', data={}, sho
 
         for j, detector_name in enumerate(show_detectors):
             line = []
+            if j == 0:
+                print(', '.join(['STATS', 'SIZE', 'IAT', 'IAT+SIZE', 'SAMP-NUM', 'SAMP-SIZE']))
             for ind, dataset_name in enumerate(show_datasets):
                 line = s_data[detector_name][ind]
                 v_str = " & ".join([str(v) for v in line])
@@ -1863,6 +1815,7 @@ def write_combined_reuslts_to_table(f='', tab_f='', all_neeed_f='', data={}, sho
                     line = _line
                     break
                 s += (_s + 1)
+                print(j, detector_name, ind, dataset_name, line, v_str, flush=True)
                 line = line.replace('{v}', v_str)
                 all_neeed_f.write(line + '\n')
 
@@ -1914,7 +1867,7 @@ def write_combined_reuslts_to_table(f='', tab_f='', all_neeed_f='', data={}, sho
 
 
 def xlsx2latex_figure(input_file='', output_file='output_data', caption='', tab_type='basic_representation',
-                      fig_flg='default', gs=True, f='',
+                      fig_flg='default', appendix=True, gs=True, f='',
                       num_feat=4, verbose=1):
     """
 
@@ -1956,6 +1909,36 @@ def xlsx2latex_figure(input_file='', output_file='output_data', caption='', tab_
                               latex='figure',
                               fig_flg=fig_flg,
                               output_file=output_file)  # start from the 18th row
+            if appendix:
+                fig2, label2, caption2, data2, show_dataset2, show_repres2, colors2, all_needed_data2, show_needed_repres2 \
+                    = append2file(out_f, tab_type,
+                                  detector_name=key, gs=gs,
+                                  value_lst=value_lst,
+                                  latex='figure',
+                                  fig_flg='rest',
+                                  output_file=output_file)  # start from the 18th row
+                data1['data'] += data2['data']
+                data1['test_size'] += data2['test_size']
+                show_dataset1 += show_dataset2
+                all_needed_data['data'] += all_needed_data2['data']
+                all_needed_data['test_size'] += all_needed_data2['test_size']
+
+                # data1: UNB(PC1), UNB(PC4), CTU, MAWI, TV&RT,SFrig, and BSTCH
+                # data2: UNB(PC2), UNB(PC3), UNB(PC5),  GHom, SCam
+                # UNB(PC1), UNB(PC2), UNB(PC3), UNB(PC4), UNB(PC5), CTU, MAWI, TV&RT, GHom, SCam, SFrig, and BSTCH
+                def change_order(data):
+                    # change: [UNB(PC1), UNB(PC4), CTU, MAWI, TV&RT,SFrig, BSTCH, UNB(PC2), UNB(PC3), UNB(PC5), GHom,SCam]
+                    # to [UNB(PC1), UNB(PC2), UNB(PC3), UNB(PC4), UNB(PC5), CTU, MAWI, TV&RT, GHom, SCam, SFrig, BSTCH]
+                    _data = [data[0], data[7], data[8], data[1], data[9], data[2], data[3], data[4], data[10], data[11],
+                             data[5], data[6]]
+                    return _data
+
+                data1['data'] = change_order(data1['data'])
+                data1['test_size'] = change_order(data1['test_size'])
+                show_dataset1 = change_order(show_dataset1)
+                all_needed_data['data'] = change_order(all_needed_data['data'])
+                all_needed_data['test_size'] = change_order(all_needed_data['test_size'])
+
             # for d_name, d in zip(show_dataset1, data1):
             #     if d_name not in datasets.keys():
             #         datasets[d_name] = {}
@@ -2042,7 +2025,12 @@ def xlsx2latex_figure(input_file='', output_file='output_data', caption='', tab_
             # f.write('\n\n')
         # print(label1, label2)
 
-        show_detectors_lst = [['OCSVM', 'IF', 'AE', 'KDE'], ['GMM', 'PCA']]
+        # show_detectors_lst = [['OCSVM', 'IF', 'AE', 'KDE'], ['GMM', 'PCA']]
+        if not appendix:
+            show_detectors_lst = [['OCSVM', 'IF', 'AE', 'KDE']]
+        else:
+            show_detectors_lst = [['OCSVM', 'IF', 'AE', 'KDE'], ['GMM', 'PCA']]
+            # show_detectors_lst = [['GMM', 'PCA']]
         # # output_file_diff = output_file + f"-{fig_flg}-diff-gs_{gs}-latex-merged_tab.txt"
         # with open(output_file_diff, 'w') as all_neeed_f:
         #     for show_detectors in show_detectors_lst:
@@ -2053,23 +2041,27 @@ def xlsx2latex_figure(input_file='', output_file='output_data', caption='', tab_
         #                                         show_repres=show_needed_repres, fig_flg=fig_flg, caption=caption1,
         #                                         gs=gs)
 
-        output_file_diff = output_file + f"-{fig_flg}-diff-gs_{gs}-latex-tab.txt"
-        output_file_fig = output_file + f"-{fig_flg}_diff-gs{gs}-latex-fig.txt"  # for latex
+        # output_file_diff = output_file + f"-{fig_flg}-diff-gs_{gs}-latex-tab.txt"
+        # output_file_fig = output_file + f"-{fig_flg}_diff-gs{gs}-latex-fig.txt"  # for latex
+        output_file_diff = output_file + f"-{fig_flg}-diff-gs_{gs}-latex-tab-appendix.txt"
+        output_file_fig = output_file + f"-{fig_flg}_diff-gs{gs}-latex-fig-appendix.txt"  # for latex
         with open(output_file_diff, 'w') as tab_f:
             with open(output_file_fig, 'w') as fig_f:
                 for show_detectors in show_detectors_lst:
                     print(f'fig_flg:{fig_flg}, show_detectors: {show_detectors}, gs={gs}')
                     # name = "_".join(show_detectors)
+                    # tab_type = 'all_needed_data': baseline -> print(', '.join(['STATS','SIZE', 'IAT', 'IAT+SIZE','SAMP-NUM',  'SAMP-SIZE']))
                     write_combined_reuslts_to_table(all_neeed_f=f, data=all_needed_datasets,
                                                     show_detectors=show_detectors,
                                                     show_datasets=show_dataset1, tab_type='all_needed_data',
                                                     show_repres=show_needed_repres, fig_flg=fig_flg, caption=caption1,
-                                                    gs=gs)
+                                                    gs=gs, appendix_flg=appendix)
 
-                    write_combined_reuslts_to_table(f=f, tab_f=tab_f, data=datasets, show_detectors=show_detectors,
-                                                    show_datasets=show_dataset1, tab_type=tab_type,
-                                                    show_repres=show_repres1, fig_flg=fig_flg, caption=caption1,
-                                                    gs=gs)
+                    if not appendix:
+                        write_combined_reuslts_to_table(f=f, tab_f=tab_f, data=datasets, show_detectors=show_detectors,
+                                                        show_datasets=show_dataset1, tab_type=tab_type,
+                                                        show_repres=show_repres1, fig_flg=fig_flg, caption=caption1,
+                                                        gs=gs, appendix_flg=appendix)
                     caption = caption1
                     det_str = ''
                     for i_v, v in enumerate(show_detectors):
@@ -2100,7 +2092,7 @@ def xlsx2latex_figure(input_file='', output_file='output_data', caption='', tab_
                                                                        show_datasets=show_dataset1, gs=gs,
                                                                        show_repres=show_repres1, colors=colors1,
                                                                        output_file=output_file_diff1,
-                                                                       tab_type=tab_type)
+                                                                       tab_type=tab_type, appendix=appendix)
 
                     output_file_diff2 = os.path.dirname(output_file_diff) + f"/{label}_diff_on_each_dataset.pdf"
                     plot_bar_ML_seaborn(new_data, new_colors=new_colors, show_detectors=show_detectors,
@@ -2447,9 +2439,9 @@ def get_diff(values_1, values_2):
             values.append(v_1)
             continue
         if '(' in str(v_1):
-            v_1 = v_1.split('(')[0]
-            v_2 = v_2.split('(')[0]
             try:
+                v_1 = v_1.split('(')[0]
+                v_2 = v_2.split('(')[0]
                 values.append(float(f'{float(v_1) - float(v_2):.4f}'))
             except Exception as e:
                 print(f'i {i}, Error: {e}')
@@ -2491,15 +2483,21 @@ def merge_xlsx(input_files=[], output_file='merged.xlsx'):
     for t, (sheet_name, input_file) in enumerate(input_files):
         print(t, sheet_name, input_file)
         worksheet = workbook.add_worksheet(sheet_name)
-        df = pd.read_excel(input_file, header=None, index_col=None)
-        values = df.values
-        rows, cols = values.shape
-        # add column index
-        worksheet.write_row(0, 0, [str(i) for i in range(cols)])
-        for i in range(rows):
-            worksheet.write_row(i + 1, 0, [str(v) if str(v) != 'nan' else '' for v in
+        if not os.path.exists(input_file):
+            # for i in range(rows):
+            #     worksheet.write_row(i, 0, [str(v) if str(v) != 'nan' else '' for v in
+            #                                    list(values[i])])  # write a list from (row, col)
+            pass
+        else:
+            df = pd.read_excel(input_file, header=None, index_col=None)
+            values = df.values
+            rows, cols = values.shape
+            # add column index
+            # worksheet.write_row(0, 0, [str(i) for i in range(cols)])
+            for i in range(rows):
+                worksheet.write_row(i, 0, [str(v) if str(v) != 'nan' else '' for v in
                                            list(values[i])])  # write a list from (row, col)
-        # worksheet.write(df.values)
+            # worksheet.write(df.values)
     workbook.close()
 
     return output_file
@@ -2660,22 +2658,38 @@ def plot_bar_difference_seaborn(data=[], show_detectors=['OCSVM', 'AE'],
                                 show_datasets=['PC3(UNB)', 'MAWI', 'SFrig(private)'], gs=True,
                                 show_repres=['IAT', 'IAT-FFT', 'SIZE'],
                                 colors=['tab:brown', 'tab:green', 'm', 'c', 'b', 'r'],
-                                output_file="F1_for_all.pdf", xlim=[-0.1, 1], tab_type=''):
+                                output_file="F1_for_all.pdf", xlim=[-0.1, 1], tab_type='', appendix=False):
     sns.set_style("darkgrid")
     print(show_detectors)
     # create plots
     num_figs = len(show_detectors)
-    c = 2  # cols of subplots in each row
-    if num_figs > c:
-        if num_figs % c == 0:
-            r = int(num_figs // c)
+    if not appendix:
+        c = 2  # cols of subplots in each row
+        if num_figs > c:
+            if num_figs % c == 0:
+                r = int(num_figs // c)
+            else:
+                r = int(num_figs // c) + 1  # in each row, it show 4 subplot
+            fig, axes = plt.subplots(r, c, figsize=(18, 10))  # (width, height)
+            axes = axes.reshape(r, -1)
         else:
-            r = int(num_figs // c) + 1  # in each row, it show 4 subplot
-        fig, axes = plt.subplots(r, c, figsize=(18, 10))  # (width, height)
-        axes = axes.reshape(r, -1)
+            r = 1
+            fig, axes = plt.subplots(r, num_figs, figsize=(18, 5))  # (width, height)
     else:
-        r = 1
-        fig, axes = plt.subplots(r, num_figs, figsize=(18, 5))  # (width, height)
+        c = 1  # cols of subplots in each row
+        if num_figs > c:
+            if num_figs % c == 0:
+                r = int(num_figs // c)
+            else:
+                r = int(num_figs // c)  # in each row, it show 4 subplot
+            if "GMM" in ",".join(show_detectors):
+                fig, axes = plt.subplots(r, c, figsize=(18, 10))  # (width, height)
+            else:
+                fig, axes = plt.subplots(r, c, figsize=(18, 18))  # (width, height)
+            axes = axes.reshape(r, -1)
+        else:
+            r = 1
+            fig, axes = plt.subplots(r, num_figs, figsize=(18, 5))  # (width, height)
     print(f'subplots: ({r}, {c})')
     # fig, axes = plt.subplots(r, c, figsize=(18, 10))  # (width, height)
     if r == 1:
@@ -2695,7 +2709,7 @@ def plot_bar_difference_seaborn(data=[], show_detectors=['OCSVM', 'AE'],
                 new_data[dataset_name] = {detector_name: {}, 'test_size': [], 'yerr': []}
 
             if tab_type.upper() == "basic_representation".upper():
-                features = ['STATS', 'IAT', 'IAT-FFT', 'SAMP-NUM', 'SAMP-NUM-FFT']
+                features = ['STATS', 'IAT', 'IAT-FFT', 'SAMP-NUM', 'SAMP-NUM-FFT', 'SAMP-SIZE', 'SAMP-SIZE-FFT']
                 f_dict = dict(zip(features, [i for i in range(len(features))]))
                 # datasets[key][d_name][gs] = (fig2, label2, caption2, d)
                 A = 'IAT'
@@ -2723,7 +2737,24 @@ def plot_bar_difference_seaborn(data=[], show_detectors=['OCSVM', 'AE'],
                 # new_colors = ['b', 'r']
                 new_colors = seaborn_palette(tab_type, fig_type='diff').values()
 
-                yerr = [1 / np.sqrt(test_size)] * 2
+                # datasets[key][d_name][gs] = (fig2, label2, caption2, d)
+                A = 'SAMP-SIZE'
+                B = 'SAMP-SIZE-FFT'
+                max_auc, min_auc = data[detector_name][dataset_name][gs][-1][f_dict[A]].split('(')[1].split(')')[
+                    0].split('-')
+                pre_aucs = [float(max_auc), float(min_auc)]  # max and min aucs
+                max_auc, min_auc = data[detector_name][dataset_name][gs][-1][f_dict[B]].split('(')[1].split(')')[
+                    0].split('-')
+                aucs = [float(max_auc), float(min_auc)]  # max and min aucs
+                diff = [v - p_v for p_v, v in zip(pre_aucs, aucs)]
+                repres_pair = f"{B} \\ {A}"
+                sub_dataset.append((dataset_name, repres_pair, diff[0]))
+                new_data[dataset_name][detector_name][gs][repres_pair] = diff[0]
+                # new_colors = ['b', 'r']
+                new_colors = seaborn_palette(tab_type, fig_type='diff').values()
+                yerr = [1 / np.sqrt(test_size)] * 3
+
+                # yerr = [1 / np.sqrt(test_size)] * 2
 
             elif tab_type.upper() == "effect_size".upper():
                 features = ['STATS', 'SIZE', 'IAT', 'IAT+SIZE', 'SAMP-NUM', 'SAMP-SIZE']
@@ -2863,7 +2894,13 @@ def plot_bar_difference_seaborn(data=[], show_detectors=['OCSVM', 'AE'],
         g.set_ylim(-1, 1)
         font_size = 20
         g.set_ylabel('AUC difference', fontsize=font_size + 4)
-        g.set_xticklabels(g.get_xticklabels(), fontsize=font_size + 4, rotation=30, ha="center")
+        if appendix:
+            if j < len(show_detectors) - 1:
+                g.set_xticklabels([])
+            else:
+                g.set_xticklabels(g.get_xticklabels(), fontsize=font_size + 4, rotation=30, ha="center")
+        else:
+            g.set_xticklabels(g.get_xticklabels(), fontsize=font_size + 4, rotation=30, ha="center")
         # yticks(np.arange(0, 1, step=0.2))
         # g.set_yticklabels([f'{x:.2f}' for x in g.get_yticks() if x%0.5==0], fontsize=font_size + 4)
 
@@ -2937,7 +2974,13 @@ def plot_bar_difference_seaborn(data=[], show_detectors=['OCSVM', 'AE'],
         if r == 1:
             plt.subplots_adjust(bottom=0.35)
         else:
-            plt.subplots_adjust(bottom=0.18)
+            if appendix:
+                if "GMM" in ",".join(show_detectors):
+                    plt.subplots_adjust(bottom=0.2)
+                else:
+                    plt.subplots_adjust(bottom=0.10)
+            else:
+                plt.subplots_adjust(bottom=0.18)
     except Warning as e:
         raise ValueError(e)
 
@@ -3163,138 +3206,197 @@ def save_total_results(results, output_file='xxx.txt', detector_name='GMM', para
 
 
 def main():
-    # # 1. xxx.dat to csv
-    # output_file ='output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat'
-    detector_name, output_file = ('GMM', 'out/reprst/GMM_result_2020-12-23 04:47:46.txt.dat')
-    if os.path.exists(output_file):
-        print('++++', output_file, flush=True)
-    with open(output_file, 'rb') as out_hdl:
-        results = pickle.load(out_hdl)
-    print(results)
-    file_name = write2csv(results, detector_name=detector_name)
-    print(file_name)
-    # # 2. csv to xlsx
-    # # filename=write2xls(results)
-    # # # refresh(filename=filename)
-    # # detector_name = 'KDE'
-    # # input_file = f'../output_data/{detector_name}_results.txt'
-    # # input_file='../output_data/result_2020-01-04 12:41:53.txt'
-    # #
-    # # results = load_result_data(input_file)
-    # # filename = write2csv(results, detector_name=detector_name, output_file=input_file + '.csv')
-    # # print(filename)
-    # # file_name = '../output_data/AE_result_2020-01-17 23:11:00.txt.dat.csv'
-    # # # file_name='../output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat.csv'
-    # file_name = csv2xlsx(file_name, output_file=file_name + '.xlsx')
-    # print(file_name)
+    case = 'find_difference'
+    case = 'csv2figs'
+    out_dir = 'out/report/reprst_srcip/20210128-MAWI'
+    if case == 'write2csv':
+        # # 1. xxx.dat to csv
+        # output_file ='output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat'
+        detector_name, output_file = ('GMM', f'{out_dir}/GMM_result_2020-12-23 04:47:46.txt.dat')
+        if os.path.exists(output_file):
+            print('++++', output_file, flush=True)
+        with open(output_file, 'rb') as out_hdl:
+            results = pickle.load(out_hdl)
+        print(results)
+        file_name = write2csv(results, detector_name=detector_name)
+        print(file_name)
+    elif case == 'csv2xlsx':
+        # 2. csv to xlsx
+        # filename=write2xls(results)
+        # # refresh(filename=filename)
+        detector_name = 'KDE'
+        input_file = f'../output_data/{detector_name}_results.txt'
+        # input_file='../output_data/result_2020-01-04 12:41:53.txt'
+        #
+        results = load_result_data(input_file)
+        filename = write2csv(results, detector_name=detector_name, output_file=input_file + '.csv')
+        print(filename)
+        # file_name = '../output_data/AE_result_2020-01-17 23:11:00.txt.dat.csv'
+        # # file_name='../output_data/GMM_result_2020-01-28 20:22:05-tmp.txt.dat.csv'
+        # file_name = csv2xlsx(file_name, output_file=file_name + '.xlsx')
+        # print(file_name)
+    elif case == 'highlight cell':
+        # 3. highlight cell
+        file_name = '../output_data/PCA_result_2020-03-04 00/53/53-tmp.txt.dat.csv.xlsx_highlight.xlsx'
+        file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
+        file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
+        print(file_name)
+    elif case == 'find_difference':  # file_name_1 - file_name_2
+        # # 4. find differences between two xlsx.
+        # # # file_name = 'output_data/KDE-IF-Results-q_flow=0.90-20200130.xlsx'
+        # dir_root = 'out'
+        # file_name_1 = f'{dir_root}/output_data/AE_20200406.xlsx'
+        input_files = [
+            ("OCSVM", f'{out_dir}/OCSVM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("KDE", f'{out_dir}/KDE.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("GMM", f'{out_dir}/GMM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("IF", f'{out_dir}/IF.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("PCA", f'{out_dir}/PCA.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("AE", f'{out_dir}/AE.txt.dat.csv.xlsx_highlight.xlsx')
+        ]
+        output_file = f'{out_dir}/Results-merged.xlsx'
+        file_name_1 = merge_xlsx(input_files, output_file)
+        file_name_2 = f'{out_dir}/Results-highlight-20200509-srcip.xlsx'  #
+        output_file = file_name_1 + '.diff.xlsx'
 
-    # 3. highlight cell
-    # file_name = '../output_data/PCA_result_2020-03-04 00/53/53-tmp.txt.dat.csv.xlsx_highlight.xlsx'
-    # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
-    # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
-    # print(file_name)
+        # file_name_1 = f'out/report/reprst_srcip_new/20201227/Results-merged.xlsx'   # only src
+        # file_name_2 = f'out/report/reprst/20201227/Results-merged.xlsx'  # src+dst data
+        # # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
+        # output_file =  f'out/report/reprst_srcip_new/20201227/srcip-src_dst-diff.xlsx'
+        file_name = diff_files(file_name_1, file_name_2, output_file)
+        print(file_name)
+        # # for i, detector_name in enumerate(['KDE', 'IF']):
+        #     file_name = xlsx_highlight_cells(file_name, sheet_name=detector_name)
+        #     print(file_name)
+    elif case == 'csv2latex':
+        # 5. csv to latex tables
+        file_name = 'output_data/IF_result_2020-02-02 11:13:07-final.txt.dat.csv'
+        """2.5 change csv to latex tables
+           """
+        output_tab = csv2latex_tab('IF', input_file=file_name,
+                                   output_file=file_name + '_tabs.txt', verbose=0)
+        print(f'output_tab: {output_tab}')
+    elif case == 'keep AUC':
+        # 6. only keep AUC in xlsx
+        file_name = '../output_data/CTU-normal-malicious.xlsx'
+        file_name = clean_xlsx(file_name, output_file=file_name + '_clean.xlsx')
+    elif case == 'csv2latex2':
+        output_file = out_dir + 'results_latex.txt'
+        header = False
+        num_feat = 3
+        # if num_feat == 3:
+        #     tab_latex = tab_latex_3
+        # else:
+        #     tab_latex = tab_latex_7
+        # with open(output_file, 'w') as f:
+        #     for i, (detector, input_file) in enumerate(input_files.items()):
+        #         tab_false, tab_true = csv2latex_previous(input_file=input_file,
+        #                                                  tab_latex=tab_latex, caption=detector, do_header=header,
+        #                                                  previous_result=True,
+        #                                                  num_feat=num_feat,
+        #                                                  verbose=0)
+        #
+        #         # tab_false, tab_true = csv2latex(input_file=input_file,
+        #         #                                 tab_latex=tab_latex, caption=detector, do_header=header,
+        #         #                                 num_feat=num_feat,
+        #         #                                 verbose=0)
+        #
+        #         f.write(detector + ':' + input_file + '\n')
+        #         for line in tab_false:
+        #             f.write(line + '\n')
+        #         print()
+        #
+        #         for line in tab_true:
+        #             f.write(line + '\n')
+        #         print()
+        #         f.write('\n')
+    elif case == 'csv2figs':
+        # file_name = '../output_data/AE_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'
+        input_files = [
+            ("OCSVM", f'{out_dir}/OCSVM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("KDE", f'{out_dir}/KDE.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("GMM", f'{out_dir}/GMM.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("IF", f'{out_dir}/IF.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("PCA", f'{out_dir}/PCA.txt.dat.csv.xlsx_highlight.xlsx'),
+            ("AE", f'{out_dir}/AE.txt.dat.csv.xlsx_highlight.xlsx')
+        ]
+        output_file = f'{out_dir}/Results-merged.xlsx'
+        file_name = merge_xlsx(input_files, output_file)
+        # file_name = f'{out_dir}/Results-highlight-20201225.xlsx'
+        # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
+        # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
 
-    # # # 4. find differences between two xlsx.
-    # # # # file_name = 'output_data/KDE-IF-Results-q_flow=0.90-20200130.xlsx'
-    # dir_root = 'examples/out/'
-    # # file_name_1 = f'{dir_root}/output_data/AE_20200406.xlsx'
-    # file_name_1 = f'{dir_root}/output_data/AE_result_2020-05-06 09:43:53-dim=1.5.xlsx'
-    # file_name_2 = f'{dir_root}/output_data/GMM_20200509.xlsx'  #
-    # # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.highlight.xlsx')
-    # file_name = diff_files(file_name_1, file_name_2, output_file=file_name_2 + '.diff.xlsx')
-    # # print(file_name)
-    # # # for i, detector_name in enumerate(['KDE', 'IF']):
-    # #     file_name = xlsx_highlight_cells(file_name, sheet_name=detector_name)
-    # #     print(file_name)
+        appendex_flg = False
+        if not appendex_flg:
+            output_file = f'{out_dir}/res-best/All_latex_tables_figs.txt'  # for main paper results
+            check_n_generate_path(output_file)
+            with open(output_file, 'w') as f:
+                for fig_flg in ['default', 'rest']:  #:  # 'default' (main paper results), rest(appendix results)
+                    for gs in [True, False]:  # :  # gs=True ((best parameters), gs=False (default parameters)
+                        for i, tab_type in enumerate(['basic_representation', 'effect_size',
+                                                      'effect_header']):  # 'appd_all_without_header', 'appd_all_with_header', 'appd_samp', 'feature_dimensions']
+                            # for i, tab_type in enumerate(['effect_header']):
+                            print('\n\n******************')
+                            print(i, tab_type, gs, fig_flg)
+                            try:
+                                # xlsx2latex_tab(file_name, output_file=file_name + "-" + tab_type + '-table_latex.txt',
+                                #                tab_type=tab_type)
+                                # fig_flg = 'default'
+                                xlsx2latex_figure(f=f, input_file=file_name,
+                                                  output_file=os.path.dirname(
+                                                      output_file) + "/" + tab_type + '-' + fig_flg + '-figure_latex.txt',
+                                                  tab_type=tab_type, fig_flg=fig_flg, gs=gs, appendix=appendex_flg)
+                                # fig_flg = 'rest'
+                                # xlsx2latex_figure(file_name, output_file=file_name + "-" + tab_type + '-' + fig_flg + '-figure_latex.txt',
+                                #                   tab_type=tab_type, fig_flg=fig_flg, gs=gs)
 
-    # 5. csv to latex tables
-    # file_name = 'output_data/IF_result_2020-02-02 11:13:07-final.txt.dat.csv'
-    # """2.5 change csv to latex tables
-    #    """
-    # output_tab = csv2latex_tab('IF', input_file=file_name,
-    #                            output_file=file_name + '_tabs.txt', verbose=0)
-    # print(f'output_tab: {output_tab}')
 
-    # # 6. only keep AUC in xlsx
-    # file_name = '../output_data/CTU-normal-malicious.xlsx'
-    # file_name= clean_xlsx(file_name, output_file = file_name+'_clean.xlsx')
+                            except Exception as e:
+                                print('Error: ', i, e)
+                                traceback.print_exc()
+                                continue
 
-    # output_file = root_dir + 'results_latex.txt'
-    # header = False
-    # num_feat = 3
-    # if num_feat == 3:
-    #     tab_latex = tab_latex_3
-    # else:
-    #     tab_latex = tab_latex_7
-    # with open(output_file, 'w') as f:
-    #     for i, (detector, input_file) in enumerate(input_files.items()):
-    #         tab_false, tab_true = csv2latex_previous(input_file=input_file,
-    #                                                  tab_latex=tab_latex, caption=detector, do_header=header,
-    #                                                  previous_result=True,
-    #                                                  num_feat=num_feat,
-    #                                                  verbose=0)
-    #
-    #         # tab_false, tab_true = csv2latex(input_file=input_file,
-    #         #                                 tab_latex=tab_latex, caption=detector, do_header=header,
-    #         #                                 num_feat=num_feat,
-    #         #                                 verbose=0)
-    #
-    #         f.write(detector + ':' + input_file + '\n')
-    #         for line in tab_false:
-    #             f.write(line + '\n')
-    #         print()
-    #
-    #         for line in tab_true:
-    #             f.write(line + '\n')
-    #         print()
-    #         f.write('\n')
+                    # release the matplotlib memory
+                    # Clear the current figure.
+                    plt.clf()
+                    # Closes all the figure windows.
+                    plt.close('all')
 
-    # file_name = '../output_data/AE_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'
-    # input_files = [("OCSVM", '../output_data/OCSVM_result_2020-03-04 01:28:11-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("KDE", '../output_data/KDE_result_2020-03-04 01:28:11-tmp.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("GMM", '../output_data/GMM_result_2020-03-05 00:11:02-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("IF", '../output_data/IF_result_2020-03-04 01:28:11-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("PCA", '../output_data/PCA_result_2020-03-05 00:18:17-final.txt.dat.csv.xlsx_highlight.xlsx'),
-    #                ("AE", '../output_data/AE_result_2020-03-05 10:15:38-tmp.txt.dat.csv.xlsx_highlight.xlsx')]
-    # output_file = input_files[0][-1] + '-merged.xlsx'
-    # # file_name = merge_xlsx(input_files, output_file)
-    # file_name = 'examples/output_data/Results-highlight-20200403.xlsx'
-    # # file_name = hightlight_excel(file_name, output_file=file_name + '.-part.xlsx')  # one-cell with different color
-    # # file_name = xlsx_highlight_cells(file_name, output_file=file_name + '.all.xlsx')  # one-cell with one color
-    #
-    # output_file = file_name + '_latex_tables_figs.txt'
-    # with open(output_file, 'w') as f:
-    #     for fig_flg in ['default', 'rest']:  # 'default',
-    #         for gs in [True, False]:  #
-    #             for i, tab_type in enumerate(['basic_representation', 'effect_size',
-    #                                           'effect_header']):  # 'appd_all_without_header', 'appd_all_with_header', 'appd_samp', 'feature_dimensions']
-    #                 # for i, tab_type in enumerate(['effect_header']):
-    #                 print('\n\n******************')
-    #                 print(i, tab_type, gs, fig_flg)
-    #                 try:
-    #                     # xlsx2latex_tab(file_name, output_file=file_name + "-" + tab_type + '-table_latex.txt',
-    #                     #                tab_type=tab_type)
-    #                     # fig_flg = 'default'
-    #                     xlsx2latex_figure(f=f, input_file=file_name,
-    #                                       output_file=file_name + "-" + tab_type + '-' + fig_flg + '-figure_latex.txt',
-    #                                       tab_type=tab_type, fig_flg=fig_flg, gs=gs)
-    #                     # fig_flg = 'rest'
-    #                     # xlsx2latex_figure(file_name, output_file=file_name + "-" + tab_type + '-' + fig_flg + '-figure_latex.txt',
-    #                     #                   tab_type=tab_type, fig_flg=fig_flg, gs=gs)
-    #
-    #
-    #                 except Exception as e:
-    #                     print('Error: ', i, e)
-    #                     continue
-    #
-    #         # release the matplotlib memory
-    #         # Clear the current figure.
-    #         plt.clf()
-    #         # Closes all the figure windows.
-    #         plt.close('all')
-    #
-    #         import gc
-    #         gc.collect()
+                    import gc
+                    gc.collect()
+
+        else:
+            output_file = f'{out_dir}/res-appendix/All_latex_tables_figs-appendix.txt'  # for appendix results
+            check_n_generate_path(output_file)
+            with open(output_file, 'w') as f:
+                for gs in [True, False]:  #
+                    for i, tab_type in enumerate(['basic_representation', 'effect_size',
+                                                  'effect_header']):  # 'appd_all_without_header', 'appd_all_with_header', 'appd_samp', 'feature_dimensions']
+                        # for i, tab_type in enumerate(['effect_header']):
+                        print('\n\n******************')
+                        try:
+                            # xlsx2latex_tab(file_name, output_file=file_name + "-" + tab_type + '-table_latex.txt',
+                            #                tab_type=tab_type)
+                            fig_flg = 'default'
+                            xlsx2latex_figure(f=f, input_file=file_name,
+                                              output_file=os.path.dirname(
+                                                  output_file) + "/" + tab_type + '-' + fig_flg + '-figure_latex-appendix.txt',
+                                              tab_type=tab_type, fig_flg=fig_flg, gs=gs, appendix=appendex_flg)
+
+
+                        except Exception as e:
+                            print('Error: ', i, e)
+                            traceback.print_exc()
+                            continue
+
+                # release the matplotlib memory
+                # Clear the current figure.
+                plt.clf()
+                # Closes all the figure windows.
+                plt.close('all')
+
+                import gc
+                gc.collect()
 
 
 if __name__ == '__main__':

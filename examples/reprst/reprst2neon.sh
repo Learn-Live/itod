@@ -39,8 +39,8 @@ echo $exec_time
 ##./examples/mem_stats.sh > "mem_log_$(date +%Y-%m-%d_%H:%M:%S).txt" 2>&1 &
 #./examples/mem_stats.sh > mem_log_${exec_time}.txt 2>&1 &
 
-#for detector in GMM AE OCSVM KDE IF PCA;
-for detector in KDE; do
+for detector in GMM AE OCSVM KDE IF PCA; do
+#for detector in KDE; do
   if [ $detector = GMM ]; then # only GMM needs quickshift
 #    ### install QuickshiftPP
 #    cd itod/detector/postprocessing/quickshift/

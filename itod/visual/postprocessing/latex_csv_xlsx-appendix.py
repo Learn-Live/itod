@@ -1423,11 +1423,11 @@ def append2file(f, tab_type='', detector_name='', gs=False, value_lst=[], latex=
 
         # print(j, tab_latex[s], v)
         if fig_flg == 'default':
-            show_datasets = ['UNB(PC1)', 'UNB(PC4)', 'CTU', 'MAWI', 'TV&PC', 'SFrig', 'BSTch']
+            show_datasets = ['UNB(PC1)', 'UNB(PC4)', 'CTU', 'MAWI', 'TV&RT', 'SFrig', 'BSTch']
             # plot_bar(data['data'], datasets=show_datasets,
             #          repres=representations, colors=colors,
             #          output_file=os.path.dirname(output_file) + f"/{label.replace('/', '_')}.pdf")
-            # # plot_bar_difference_seaborn(data, datasets=['UNB(PC1)','UNB(PC4)', 'CTU', 'MAWI', 'TV&PC',  'SFrig', 'BSTch'],
+            # # plot_bar_difference_seaborn(data, datasets=['UNB(PC1)','UNB(PC4)', 'CTU', 'MAWI', 'TV&RT',  'SFrig', 'BSTch'],
             # #          representations=representations, colors=colors,
             # #          output_file=f"../output_data/{label.replace('/','_')}.pdf")
         elif fig_flg == 'rest':
@@ -1860,12 +1860,12 @@ def xlsx2latex_figure(input_file='', output_file='output_data', caption='', tab_
                 all_needed_data['data'] += all_needed_data2['data']
                 all_needed_data['test_size'] += all_needed_data2['test_size']
 
-                # data1: UNB(PC1), UNB(PC4), CTU, MAWI, TV&PC,SFrig, and BSTCH
+                # data1: UNB(PC1), UNB(PC4), CTU, MAWI, TV&RT,SFrig, and BSTCH
                 # data2: UNB(PC2), UNB(PC3), UNB(PC5),  GHom, SCam
-                # UNB(PC1), UNB(PC2), UNB(PC3), UNB(PC4), UNB(PC5), CTU, MAWI, TV&PC, GHom, SCam, SFrig, and BSTCH
+                # UNB(PC1), UNB(PC2), UNB(PC3), UNB(PC4), UNB(PC5), CTU, MAWI, TV&RT, GHom, SCam, SFrig, and BSTCH
                 def change_order(data):
-                    # change: [UNB(PC1), UNB(PC4), CTU, MAWI, TV&PC,SFrig, BSTCH, UNB(PC2), UNB(PC3), UNB(PC5), GHom,SCam]
-                    # to [UNB(PC1), UNB(PC2), UNB(PC3), UNB(PC4), UNB(PC5), CTU, MAWI, TV&PC, GHom, SCam, SFrig, BSTCH]
+                    # change: [UNB(PC1), UNB(PC4), CTU, MAWI, TV&RT,SFrig, BSTCH, UNB(PC2), UNB(PC3), UNB(PC5), GHom,SCam]
+                    # to [UNB(PC1), UNB(PC2), UNB(PC3), UNB(PC4), UNB(PC5), CTU, MAWI, TV&RT, GHom, SCam, SFrig, BSTCH]
                     _data = [data[0], data[7], data[8], data[1], data[9], data[2], data[3], data[4], data[10], data[11],
                              data[5], data[6]]
                     return _data

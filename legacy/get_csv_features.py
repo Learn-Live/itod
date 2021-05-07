@@ -291,7 +291,7 @@ class EXPT(DPP):
 
         # 1. datasets
         self.datasets = [
-            # Private IoT: TV&PC
+            # Private IoT: TV&RT
             # 'DS20_PU_SMTV/DS21-srcIP_10.42.0.1',
             # # # Private IoT
             # 'DS60_UChi_IoT/DS61-srcIP_192.168.143.20',
