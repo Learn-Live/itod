@@ -44,7 +44,7 @@ sys.path.append(lib_path)
 # reproducible.
 try:
     # if os.path.exists('_config.py'):
-    from reprst._config_reprst import *
+    from reprst.default_config import *
 
     print('from _config_reprst import *')
 except:
@@ -216,12 +216,12 @@ class DSP(Parameter):
         self.direction = 'src'  # src: only source ip data; 'both': src+dst
         if case == 'new':  # new data
             # original_ipt_dir, only copy, should not be allowed to do any modification
-            self.original_ipt_dir = "./original_data/reprst"  # new data (around 20201220)
+            self.original_ipt_dir = "./datasets/reprst"  # new data (around 20201220)
             self.ipt_dir = "data/reprst_srcip"  # ipt_dir
             self.opt_dir = "./out/reprst_srcip"  # opt_dir
         else:
             # original_ipt_dir, only copy, should not be allowed to do any modification
-            self.original_ipt_dir = "./original_data/reprst_srcip_old"  # old data (only src data before 20200601)
+            self.original_ipt_dir = "./datasets/reprst_srcip_old"  # old data (only src data before 20200601)
             self.ipt_dir = "data/reprst_srcip_old"  # ipt_dir
             self.opt_dir = "./out/reprst_srcip_old"  # opt_dir
         self.data_cat = 'INDV'  # data category: INDV, AGMT and MIX
@@ -471,15 +471,15 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
     """
     datasets = [
         # Naming: (department/dataname_year/device)
-        # 'UNB/CICIDS_2017/pc_192.168.10.5',
-        # 'UNB/CICIDS_2017/pc_192.168.10.8',
-        # 'UNB/CICIDS_2017/pc_192.168.10.9',
-        # 'UNB/CICIDS_2017/pc_192.168.10.14',
-        # 'UNB/CICIDS_2017/pc_192.168.10.15',
-        # #
-        # 'CTU/IOT_2017/pc_10.0.2.15',
+        'UNB/CICIDS_2017/pc_192.168.10.5',
+        'UNB/CICIDS_2017/pc_192.168.10.8',
+        'UNB/CICIDS_2017/pc_192.168.10.9',
+        'UNB/CICIDS_2017/pc_192.168.10.14',
+        'UNB/CICIDS_2017/pc_192.168.10.15',
         #
-        # 'MAWI/WIDE_2019/pc_202.171.168.50',
+        'CTU/IOT_2017/pc_10.0.2.15',
+
+        'MAWI/WIDE_2019/pc_202.171.168.50',
         # 'MAWI/WIDE_2020/pc_203.78.7.165', # ~25000 (flows src_dst)
         # 'MAWI/WIDE_2020/pc_23.222.78.164',    # 3 (big flows)
         # 'MAWI/WIDE_2020/pc_203.78.4.32',    # ~25000 (flows src_dst)
@@ -489,18 +489,18 @@ def main(detector_name="GMM", start_time=time.strftime(TIME_FORMAT, time.localti
         # 'MAWI/WIDE_2020/pc_202.75.33.114'  # 2000 flows(src)
         # 'MAWI/WIDE_2020/202.66.205.237'        # 580 (src)
 
-        # works
-        'MAWI/WIDE_2020/pc_203.78.4.32',
-        'MAWI/WIDE_2020/pc_203.78.4.32-2',
-        'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
+        # # works
+        # 'MAWI/WIDE_2020/pc_203.78.4.32',
+        # 'MAWI/WIDE_2020/pc_203.78.4.32-2',
+        # 'MAWI/WIDE_2020/pc_203.78.7.165-2',  # ~25000 (flows src_dst)
 
-        # # # # #
-        # 'UCHI/IOT_2019/smtv_10.42.0.1',
-        #
-        # 'UCHI/IOT_2019/ghome_192.168.143.20',
-        # 'UCHI/IOT_2019/scam_192.168.143.42',
-        # 'UCHI/IOT_2019/sfrig_192.168.143.43',
-        # 'UCHI/IOT_2019/bstch_192.168.143.48'
+        # # # #
+        'UCHI/IOT_2019/smtv_10.42.0.1',
+
+        'UCHI/IOT_2019/ghome_192.168.143.20',
+        'UCHI/IOT_2019/scam_192.168.143.42',
+        'UCHI/IOT_2019/sfrig_192.168.143.43',
+        'UCHI/IOT_2019/bstch_192.168.143.48'
 
     ]  # 'DEMO_IDS/DS-srcIP_192.168.10.5'
     gses = [False, True]

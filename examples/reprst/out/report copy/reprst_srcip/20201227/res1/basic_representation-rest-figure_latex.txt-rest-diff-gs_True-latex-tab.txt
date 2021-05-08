@@ -1,0 +1,42 @@
+\begin{table}[H]
+\centering
+\caption{OCSVM, IF, AE, and KDE with best parameters on basic representations (5 other datasets)}
+\label{tab:OCSVM_IF_AE_and_KDE_with_best_parameters_on_basic_representations_rest}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{3}{c|} {OCSVM} & \multicolumn{3}{c|} {IF} & \multicolumn{3}{c|} {AE} & \multicolumn{3}{c|} {KDE} \\ 
+\cmidrule{2-13}
+ & \Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC2) & 0.59 & 0.79 & 0.80 & 0.68 & 0.67 & 0.81 & 0.72 & 0.73 & 0.83 & 0.56 & 0.79 & 0.79  \\ 
+\ UNB(PC3) & 0.64 & 0.81 & 0.79 & 0.69 & 0.69 & 0.76 & 0.78 & 0.70 & 0.80 & 0.62 & 0.81 & 0.79 \\ 
+\ UNB(PC5) & 0.49 & 0.80 & 0.80 & 0.58 & 0.71 & 0.78 & 0.69 & 0.68 & 0.91 & 0.43 & 0.80 & 0.79 \\ 
+\midrule
+\ GHom & 0.73 & 0.69 & 0.95 & 0.88 & 0.42 & 0.96 & 0.82 & 0.33 & 0.96 & 0.57 & 0.70 & 0.96\\ 
+\midrule
+\ SCam & 0.67 & 0.53 & 0.59 & 0.64 & 0.54 & 0.63 & 0.67 & 0.54 & 0.61 & 0.68 & 0.47 & 0.56\\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}
+\begin{table}[H]
+\centering
+\caption{GMM and PCA with best parameters on basic representations (5 other datasets)}
+\label{tab:GMM_and_PCA_with_best_parameters_on_basic_representations_rest}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{3}{c|} {GMM} & \multicolumn{3}{c|} {PCA} \\ 
+\cmidrule{2-7}
+ & \Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC2) & 0.78 & 0.71 & 0.81 & 0.69 & 0.43 & 0.79  \\ 
+\ UNB(PC3) & 0.87 & 0.77 & 0.81 & 0.71 & 0.32 & 0.81 \\ 
+\ UNB(PC5) & 0.81 & 0.74 & 0.86 & 0.67 & 0.38 & 0.75 \\ 
+\midrule
+\ GHom & 0.97 & 0.91 & 0.96 & 0.72 & 0.05 & 0.96\\ 
+\midrule
+\ SCam & 0.54 & 0.47 & 0.63 & 0.63 & 0.62 & 0.59\\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}

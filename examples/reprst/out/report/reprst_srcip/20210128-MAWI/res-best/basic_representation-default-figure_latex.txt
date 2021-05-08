@@ -1,0 +1,48 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{OCSVM_with_default_parameters_on_basic_representations.pdf}
+\caption{OCSVM with default parameters on basic representations}
+\label{fig:OCSVM_with_default_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{KDE_with_default_parameters_on_basic_representations.pdf}
+\caption{KDE with default parameters on basic representations}
+\label{fig:KDE_with_default_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{GMM_with_default_parameters_on_basic_representations.pdf}
+\caption{GMM with default parameters on basic representations}
+\label{fig:GMM_with_default_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{IF_with_default_parameters_on_basic_representations.pdf}
+\caption{IF with default parameters on basic representations}
+\label{fig:IF_with_default_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{PCA_with_default_parameters_on_basic_representations.pdf}
+\caption{PCA with default parameters on basic representations}
+\label{fig:PCA_with_default_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{AE_with_default_parameters_on_basic_representations.pdf}
+\caption{AE with default parameters on basic representations}
+\label{fig:AE_with_default_parameters_on_basic_representations}
+\end{figure}
+
+

@@ -1,0 +1,42 @@
+\begin{table}[H]
+\centering
+\caption{OCSVM, IF, AE, and KDE with best parameters on representations without packet header (5 other datasets)}
+\label{tab:OCSVM_IF_AE_and_KDE_with_best_parameters_on_representations_without_packet_header_rest}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{2}{c|} {OCSVM} & \multicolumn{2}{c|} {IF} & \multicolumn{2}{c|} {AE} & \multicolumn{2}{c|} {KDE} \\ 
+\cmidrule{2-9}
+ & \Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE}    \\ 
+\midrule
+\ UNB(PC2) & 0.59 & 0.81 & 0.81 & 0.68 & 0.73 & 0.75 & 0.72 & 0.81 & 0.78 & 0.56 & 0.81 & 0.81  \\ 
+\ UNB(PC3) & 0.64 & 0.89 & 0.89 & 0.69 & 0.80 & 0.74 & 0.78 & 0.94 & 0.73 & 0.62 & 0.89 & 0.91 \\ 
+\ UNB(PC5) & 0.49 & 0.86 & 0.79 & 0.58 & 0.78 & 0.79 & 0.69 & 0.87 & 0.82 & 0.43 & 0.86 & 0.80 \\ 
+\midrule
+\ GHom & 0.73 & 0.69 & 0.94 & 0.88 & 0.44 & 0.96 & 0.82 & 0.83 & 0.96 & 0.57 & 0.71 & 0.95\\ 
+\midrule
+\ SCam & 0.67 & 0.61 & 0.66 & 0.64 & 0.55 & 0.64 & 0.67 & 0.47 & 0.64 & 0.68 & 0.62 & 0.65\\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}
+\begin{table}[H]
+\centering
+\caption{GMM and PCA with best parameters on representations without packet header (5 other datasets)}
+\label{tab:GMM_and_PCA_with_best_parameters_on_representations_without_packet_header_rest}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{2}{c|} {GMM} & \multicolumn{2}{c|} {PCA} \\ 
+\cmidrule{2-5}
+ & \Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE}    \\ 
+\midrule
+\ UNB(PC2) & 0.78 & 0.82 & 0.83 & 0.69 & 0.83 & 0.67  \\ 
+\ UNB(PC3) & 0.87 & 0.89 & 0.81 & 0.71 & 0.90 & 0.72 \\ 
+\ UNB(PC5) & 0.81 & 0.87 & 0.81 & 0.67 & 0.86 & 0.77 \\ 
+\midrule
+\ GHom & 0.97 & 0.95 & 0.96 & 0.72 & 0.14 & 0.95\\ 
+\midrule
+\ SCam & 0.54 & 0.68 & 0.64 & 0.63 & 0.61 & 0.60\\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}

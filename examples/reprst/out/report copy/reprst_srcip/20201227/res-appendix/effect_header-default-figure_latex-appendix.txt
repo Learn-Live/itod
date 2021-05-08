@@ -1,0 +1,96 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_OCSVM_with_default_parameters.pdf}
+\caption{Effect of Packet Header: OCSVM with default parameters}
+\label{fig:Effect_of_Packet_Header_OCSVM_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_OCSVM_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: OCSVM with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_OCSVM_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_KDE_with_default_parameters.pdf}
+\caption{Effect of Packet Header: KDE with default parameters}
+\label{fig:Effect_of_Packet_Header_KDE_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_KDE_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: KDE with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_KDE_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_GMM_with_default_parameters.pdf}
+\caption{Effect of Packet Header: GMM with default parameters}
+\label{fig:Effect_of_Packet_Header_GMM_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_GMM_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: GMM with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_GMM_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_IF_with_default_parameters.pdf}
+\caption{Effect of Packet Header: IF with default parameters}
+\label{fig:Effect_of_Packet_Header_IF_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_IF_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: IF with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_IF_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_PCA_with_default_parameters.pdf}
+\caption{Effect of Packet Header: PCA with default parameters}
+\label{fig:Effect_of_Packet_Header_PCA_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_PCA_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: PCA with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_PCA_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_AE_with_default_parameters.pdf}
+\caption{Effect of Packet Header: AE with default parameters}
+\label{fig:Effect_of_Packet_Header_AE_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_AE_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: AE with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_AE_with_default_parameters_rest}
+\end{figure}
+
+

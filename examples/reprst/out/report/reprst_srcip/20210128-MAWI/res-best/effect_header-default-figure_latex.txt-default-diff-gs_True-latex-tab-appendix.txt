@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\caption{OCSVM, IF, AE, and KDE with best parameters on representations without packet header}
+\label{tab:OCSVM_IF_AE_and_KDE_with_best_parameters_on_representations_without_packet_header}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{2}{c|} {OCSVM} & \multicolumn{2}{c|} {IF} & \multicolumn{2}{c|} {AE} & \multicolumn{2}{c|} {KDE} \\ 
+\cmidrule{2-9}
+ & \Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE} &\Cell{IAT+S\\IZE} & \Cell{SAMP-\\SIZE}    \\ 
+\midrule
+\ UNB(PC1) & 1.00 & 0.99 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.99 & 1.00  \\ 
+\ UNB(PC4) & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\ 
+\midrule
+\ CTU & 1.00 & 0.97 & 0.99 & 0.99 & 0.97 & 0.95 & 1.00 & 0.99 & 0.99 & 1.00 & 0.97 & 0.99\\ 
+\midrule
+\ MAWI & {v}\\ 
+\midrule
+\ TV\&PC & {v}\\ 
+\midrule
+\ SFrig & {v} \\ 
+\ BSTch & {v}  \\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}

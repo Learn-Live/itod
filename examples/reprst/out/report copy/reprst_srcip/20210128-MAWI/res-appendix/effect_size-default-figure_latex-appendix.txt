@@ -1,0 +1,16 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Size_OCSVM_with_default_parameters.pdf}
+\caption{Effect of Size: OCSVM with default parameters}
+\label{fig:Effect_of_Size_OCSVM_with_default_parameters}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Size_OCSVM_with_default_parameters_rest.pdf}
+\caption{Effect of Size: OCSVM with default parameters_rest}
+\label{fig:Effect_of_Size_OCSVM_with_default_parameters_rest}
+\end{figure}
+
+

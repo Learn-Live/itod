@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\caption{Effect of Size: OCSVM, IF, AE, and KDE with best parameters}
+\label{tab:Effect_of_Size_OCSVM_IF_AE_and_KDE_with_best_parameters}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{2}{c|} {OCSVM} & \multicolumn{2}{c|} {IF} & \multicolumn{2}{c|} {AE} & \multicolumn{2}{c|} {KDE} \\ 
+\cmidrule{2-9}
+ & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC1) & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.97 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00  \\ 
+\ UNB(PC4) & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.98 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\ 
+\midrule
+\ CTU & 1.00 & 1.00 & 0.97 & 0.99 & 0.99 & 0.98 & 0.94 & 0.96 & 1.00 & 0.99 & 0.94 & 0.99 & 1.00 & 1.00 & 0.97 & 1.00\\ 
+\midrule
+\ MAWI & {v}\\ 
+\midrule
+\ TV\&PC & {v}\\ 
+\midrule
+\ SFrig & {v} \\ 
+\ BSTch & {v}  \\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}

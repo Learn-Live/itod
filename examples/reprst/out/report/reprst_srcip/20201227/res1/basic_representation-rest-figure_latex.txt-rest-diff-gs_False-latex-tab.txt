@@ -1,0 +1,42 @@
+\begin{table}[H]
+\centering
+\caption{OCSVM, IF, AE, and KDE with default parameters on basic representations (5 other datasets)}
+\label{tab:OCSVM_IF_AE_and_KDE_with_default_parameters_on_basic_representations_rest}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{3}{c|} {OCSVM} & \multicolumn{3}{c|} {IF} & \multicolumn{3}{c|} {AE} & \multicolumn{3}{c|} {KDE} \\ 
+\cmidrule{2-13}
+ & \Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC2) & 0.48 & 0.79 & 0.79 & 0.66 & 0.68 & 0.79 & 0.64 & 0.68 & 0.81 & 0.56 & 0.79 & 0.78  \\ 
+\ UNB(PC3) & 0.54 & 0.82 & 0.78 & 0.69 & 0.69 & 0.76 & 0.54 & 0.34 & 0.80 & 0.62 & 0.82 & 0.78 \\ 
+\ UNB(PC5) & 0.49 & 0.74 & 0.77 & 0.55 & 0.68 & 0.78 & 0.70 & 0.68 & 0.80 & 0.34 & 0.73 & 0.78 \\ 
+\midrule
+\ GHom & 0.73 & 0.07 & 0.95 & 0.86 & 0.42 & 0.96 & 0.88 & 0.28 & 0.96 & 0.57 & 0.05 & 0.95\\ 
+\midrule
+\ SCam & 0.68 & 0.53 & 0.56 & 0.63 & 0.50 & 0.63 & 0.48 & 0.49 & 0.60 & 0.68 & 0.47 & 0.56\\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}
+\begin{table}[H]
+\centering
+\caption{GMM and PCA with default parameters on basic representations (5 other datasets)}
+\label{tab:GMM_and_PCA_with_default_parameters_on_basic_representations_rest}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{3}{c|} {GMM} & \multicolumn{3}{c|} {PCA} \\ 
+\cmidrule{2-7}
+ & \Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{STATS} & \Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC2) & 0.59 & 0.70 & 0.79 & 0.58 & 0.41 & 0.80  \\ 
+\ UNB(PC3) & 0.63 & 0.74 & 0.80 & 0.62 & 0.29 & 0.79 \\ 
+\ UNB(PC5) & 0.81 & 0.70 & 0.78 & 0.39 & 0.39 & 0.75 \\ 
+\midrule
+\ GHom & 0.39 & 0.67 & 0.96 & 0.40 & 0.06 & 0.96\\ 
+\midrule
+\ SCam & 0.63 & 0.42 & 0.63 & 0.63 & 0.60 & 0.57\\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}

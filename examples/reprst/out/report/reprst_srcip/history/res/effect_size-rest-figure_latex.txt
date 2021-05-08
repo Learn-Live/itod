@@ -1,0 +1,24 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Size_GMM_with_default_parameters_rest.pdf}
+\caption{Effect of Size: GMM with default parameters_rest}
+\label{fig:Effect_of_Size_GMM_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Size_IF_with_default_parameters_rest.pdf}
+\caption{Effect of Size: IF with default parameters_rest}
+\label{fig:Effect_of_Size_IF_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Size_PCA_with_default_parameters_rest.pdf}
+\caption{Effect of Size: PCA with default parameters_rest}
+\label{fig:Effect_of_Size_PCA_with_default_parameters_rest}
+\end{figure}
+
+

@@ -1,0 +1,24 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_GMM_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: GMM with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_GMM_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_IF_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: IF with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_IF_with_default_parameters_rest}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{Effect_of_Packet_Header_PCA_with_default_parameters_rest.pdf}
+\caption{Effect of Packet Header: PCA with default parameters_rest}
+\label{fig:Effect_of_Packet_Header_PCA_with_default_parameters_rest}
+\end{figure}
+
+

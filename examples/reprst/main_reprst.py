@@ -213,7 +213,7 @@ class DSP(Parameter):
         super(DSP, self).__init__()
         self.dataset_name = dataset_name
         # original_ipt_dir, only copy, should not be allowed to do any modification
-        self.original_ipt_dir = "./original_data/reprst"
+        self.original_ipt_dir = "./datasets/reprst"
         self.ipt_dir = "data/reprst"  # ipt_dir
         self.opt_dir = "./out/reprst"  # opt_dir
         self.data_cat = 'INDV'  # data category: INDV, AGMT and MIX

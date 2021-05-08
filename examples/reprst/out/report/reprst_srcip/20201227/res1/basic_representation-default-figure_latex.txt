@@ -1,0 +1,52 @@
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{OCSVM_with_best_parameters_on_basic_representations.pdf}
+\caption{OCSVM with best parameters on basic representations}
+\label{fig:OCSVM_with_best_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{KDE_with_best_parameters_on_basic_representations.pdf}
+\caption{KDE with best parameters on basic representations}
+\label{fig:KDE_with_best_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{GMM_with_best_parameters_on_basic_representations.pdf}
+\caption{GMM with best parameters on basic representations}
+\label{fig:GMM_with_best_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{IF_with_best_parameters_on_basic_representations.pdf}
+\caption{IF with best parameters on basic representations}
+\label{fig:IF_with_best_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{PCA_with_best_parameters_on_basic_representations.pdf}
+\caption{PCA with best parameters on basic representations}
+\label{fig:PCA_with_best_parameters_on_basic_representations}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.80\textwidth]{AE_with_best_parameters_on_basic_representations.pdf}
+\caption{AE with best parameters on basic representations}
+\label{fig:AE_with_best_parameters_on_basic_representations}
+\end{figure}
+
+
+t_parameters_on_basic_representations}
+\end{figure}
+
+

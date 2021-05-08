@@ -1,0 +1,50 @@
+\begin{table}[H]
+\centering
+\caption{Effect of Size: OCSVM, IF, AE, and KDE with best parameters}
+\label{tab:Effect_of_Size_OCSVM_IF_AE_and_KDE_with_best_parameters}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{2}{c|} {OCSVM} & \multicolumn{2}{c|} {IF} & \multicolumn{2}{c|} {AE} & \multicolumn{2}{c|} {KDE} \\ 
+\cmidrule{2-9}
+ & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC1) & 0.48 & 0.77 & 0.81 & 0.76 & 0.49 & 0.52 & 0.63 & 0.77 & 0.68 & 0.63 & 0.70 & 0.83 & 0.31 & 0.77 & 0.83 & 0.72  \\ 
+\ UNB(PC4) & 0.55 & 0.73 & 0.86 & 0.75 & 0.60 & 0.47 & 0.70 & 0.81 & 0.79 & 0.68 & 0.71 & 0.84 & 0.52 & 0.71 & 0.86 & 0.75 \\ 
+\midrule
+\ CTU & 0.64 & 0.77 & 0.76 & 0.91 & 0.78 & 0.79 & 0.86 & 0.89 & 0.49 & 0.83 & 0.93 & 0.91 & 0.76 & 0.83 & 0.77 & 0.92\\ 
+\midrule
+\ MAWI & 0.88 & 0.47 & 0.45 & 0.59 & 0.86 & 0.69 & 0.42 & 0.62 & 0.49 & 0.62 & 0.46 & 0.60 & 0.86 & 0.55 & 0.47 & 0.59\\ 
+\midrule
+\ TV\&PC & 1.00 & 1.00 & 0.96 & 0.93 & 0.95 & 0.98 & 0.90 & 0.75 & 1.00 & 1.00 & 0.97 & 0.85 & 1.00 & 1.00 & 0.97 & 0.89\\ 
+\midrule
+\ SFrig & 0.98 & 0.89 & 0.82 & 0.96 & 0.96 & 0.95 & 0.59 & 0.94 & 0.91 & 0.92 & 0.73 & 0.97 & 0.97 & 0.90 & 0.80 & 0.95 \\ 
+\ BSTch & 0.95 & 0.98 & 0.97 & 0.95 & 0.95 & 0.98 & 0.94 & 0.98 & 0.96 & 0.94 & 0.97 & 0.97 & 0.94 & 0.98 & 0.95 & 0.95  \\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}
+\begin{table}[H]
+\centering
+\caption{Effect of Size: GMM and PCA with best parameters}
+\label{tab:Effect_of_Size_GMM_and_PCA_with_best_parameters}
+\begin{tabulary}{0.99\textwidth}{|@{}L|C|C|C|C|}
+\toprule
+\multirow{2}{*}{~\rule{0pt}{2.7ex} Dataset} &  \multicolumn{2}{c|} {GMM} & \multicolumn{2}{c|} {PCA} \\ 
+\cmidrule{2-5}
+ & \Cell{IAT} & \Cell{SAMP-\\NUM} &\Cell{IAT} & \Cell{SAMP-\\NUM}    \\ 
+\midrule
+\ UNB(PC1) & 0.56 & 0.61 & 0.75 & 0.80 & 0.74 & 0.27 & 0.41 & 0.77  \\ 
+\ UNB(PC4) & 0.87 & 0.71 & 0.65 & 0.81 & 0.72 & 0.60 & 0.74 & 0.75 \\ 
+\midrule
+\ CTU & 0.69 & 0.70 & 0.90 & 0.90 & 0.81 & 0.74 & 0.75 & 0.89\\ 
+\midrule
+\ MAWI & 0.87 & 0.67 & 0.49 & 0.63 & 0.70 & 0.45 & 0.40 & 0.59\\ 
+\midrule
+\ TV\&PC & 1.00 & 1.00 & 0.98 & 0.93 & 0.99 & 1.00 & 0.97 & 0.65\\ 
+\midrule
+\ SFrig & 0.98 & 0.97 & 0.88 & 0.96 & 0.80 & 0.91 & 0.71 & 0.95 \\ 
+\ BSTch & 0.99 & 0.98 & 0.95 & 0.97 & 0.97 & 0.08 & 0.92 & 0.95  \\ 
+\bottomrule
+\end{tabulary}
+\end{table}
+\end{table}
