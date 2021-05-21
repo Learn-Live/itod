@@ -12,13 +12,16 @@ requests>=2.22.0
 #pip3.7 install colorama --user
 #pip3.7 install pyod --user # without needing root
 #pip3.7 install jinja2 --user
+# pip3 install matplotlib seaborn xlrd xlswriter pandas
 #pip3.7 install xlrd --user
+#pip3.7 install xlsxwriter --user
+
 #pip3.7 install memory_profiler --user
 #pip3.7 install h5py --user
 #pip3.7 install pretty_errors --user
 #pip3.7 install group-lasso --user
 #pip3.7 install pympler --user
-#pip3.7 install xlsxwriter --user
+
 #pip3.7 install scikit-learn==0.22 --user
 #pip3.7 install pyod==0.7.7.1 --user
 #pip3.7 install tensorflow_gpu==2.0.0 --user

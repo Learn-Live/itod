@@ -3,6 +3,10 @@
 - Let Y in {0, 1} denote normal or novelty, and X1, .., X9 denote the packet header information.
 - Compute the correlation(Xi, Y) for each of the Xi’s (do this on the test data).
 
+    command
+
+
+
 """
 import os, sys
 import pickle
@@ -24,8 +28,15 @@ import numpy as np
 
 sns.set()
 
+
 # from itod.ndm.train_test import extract_data, preprocess_data
-from itod.utils.utils import dump_data
+# from itod.utils.utils import dump_data
+
+
+def dump_data(data, file_out='data.dat'):
+    with open(file_out, 'wb') as f:
+        pickle.dump(data, f)
+
 
 # 0.4 get root logger
 # from itod import log
@@ -52,7 +63,8 @@ datasets = [
     'UCHI/IOT_2019/sfrig_192.168.143.43',
     # 'UCHI/IOT_2019/bstch_192.168.143.48'
 
-]  # 'DEMO_IDS/DS-srcIP_192.168.10.5'
+]
+
 
 def _get_each_correlation(x, y):
     rho = np.corrcoef(x, y)[0, 1]
@@ -297,6 +309,8 @@ def main():
     else:  # src_dst
         in_dir = 'data/reprst'
         out_dir = 'out/reprst/correlation'
+
+    print(os.path.abspath(os.getcwd()))
     corr_results = get_correlation(in_dir, out_dir, header=True)
 
     plot_correlation(corr_results, out_dir, show=True)
